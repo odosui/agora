@@ -1,10 +1,13 @@
 import OpenAI from "openai";
 
+type ChatCompletionMessageParam =
+  OpenAI.Chat.Completions.ChatCompletionMessageParam;
+
 export class OpenAiChat {
   private model: string;
 
   private client: OpenAI;
-  private messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
+  private messages: ChatCompletionMessageParam[] = [];
 
   private listeners: ((msg: string) => void)[] = [];
   private finishListeners: (() => void)[] = [];

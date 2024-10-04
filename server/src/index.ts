@@ -6,15 +6,8 @@ import { v4 } from "uuid";
 import { OpenAiChat } from "./vendors/openai";
 import { AnthropicChat } from "./vendors/anthropic";
 
-const SYSTEM = [
-  "You are a professional TypeScript and React programmer. You task is to build a website based on provided description.",
-  "At any time you can ask to update a specific file. Write UPDATE_FILE: <path_of_the_file_to_update>, followed by code.",
-  "At any time you can ask to install an npm module: write INSTALL_PACKAGE <name>.",
-  "At any time you can ask for a screenshot: write PROVIDE_SCREENSHOT.",
-  "Please be consise, and don't explain anything until asked by a user.",
-  "Consider the following good practices: files should be small, components should be reusable, the code should be clean and easy to understand. In CSS, use CSS variables. Use css variables (--u1, --u2, and so on) for length units.",
-  "You start at `src/App.tsx`.",
-].join("\n");
+const DEFAULT_SYSTEM =
+  "You are a helpful assistant. You answer concisely and to the point.";
 
 const PORT = process.env.PORT || 3000;
 
@@ -109,7 +102,11 @@ async function main() {
         const id = v4();
 
         if (p.vendor === "openai") {
-          const chat = new OpenAiChat(config.openai_key, p.model, p.system);
+          const chat = new OpenAiChat(
+            config.openai_key,
+            p.model,
+            p.system ?? DEFAULT_SYSTEM
+          );
           chats[id] = {
             profile: data.profile,
             messages: [],
@@ -122,7 +119,7 @@ async function main() {
           const chat = new AnthropicChat(
             config.anthropic_key,
             p.model,
-            p.system
+            p.system ?? DEFAULT_SYSTEM
           );
           chats[id] = {
             profile: data.profile,

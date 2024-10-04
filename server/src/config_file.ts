@@ -8,7 +8,7 @@ type ConfigFile = {
     {
       vendor: "openai" | "anthropic";
       model: string;
-      system: string;
+      system?: string;
     }
   >;
 };
