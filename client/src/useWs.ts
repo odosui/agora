@@ -11,7 +11,9 @@ export function useWs() {
   const startChat = (profile: string) => {
     const e: WsInputMessage = {
       type: "START_CHAT",
-      profile,
+      payload: {
+        profile,
+      },
     };
 
     console.log("Starting chat", e);
@@ -28,9 +30,11 @@ export function useWs() {
   ) => {
     const e: WsInputMessage = {
       type: "POST_MESSAGE",
-      content: message,
-      image: file,
-      chatId,
+      payload: {
+        content: message,
+        image: file,
+        chatId,
+      },
     };
 
     sendJsonMessage(e);

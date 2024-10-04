@@ -57,24 +57,30 @@ const Chat: React.FC<{
   const handleWsMessage = useCallback(
     (msg: WsOutputMessage) => {
       if (msg.type === "CHAT_PARTIAL_REPLY") {
-        if (msg.chatId !== id) return;
+        if (msg.payload.chatId !== id) return;
         setMessages((prev) => {
           const lastMsg = prev[prev.length - 1];
           if (lastMsg?.from === "assistant") {
             return [
               ...prev.slice(0, prev.length - 1),
-              { from: "assistant", content: lastMsg.content + msg.content },
+              {
+                from: "assistant",
+                content: lastMsg.content + msg.payload.content,
+              },
             ];
           } else {
-            return [...prev, { from: "assistant", content: msg.content }];
+            return [
+              ...prev,
+              { from: "assistant", content: msg.payload.content },
+            ];
           }
         });
       } else if (msg.type === "CHAT_REPLY_FINISH") {
-        if (msg.chatId !== id) return;
+        if (msg.payload.chatId !== id) return;
         setWaitingTillReplyFinish(false);
       } else if (msg.type === "CHAT_ERROR") {
-        if (msg.chatId !== id) return;
-        setChatError(msg.error);
+        if (msg.payload.chatId !== id) return;
+        setChatError(msg.payload.error);
       } else {
         // don't care
       }
@@ -186,7 +192,7 @@ const Chat: React.FC<{
   );
 };
 
-async function fileToBase64(file: File): Promise<string> {
+async function fileToBase64(file: File) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {

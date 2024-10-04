@@ -1,35 +1,51 @@
 export type WsInputMessage =
   | {
       type: "POST_MESSAGE";
-      content: string;
-      image?: {
-        data: string;
-        type: string;
+      payload: {
+        content: string;
+        image?: {
+          data: string;
+          type: string;
+        };
+        chatId: string;
       };
-      chatId: string;
     }
   | {
       type: "START_CHAT";
-      profile: string;
+      payload: {
+        profile: string;
+      };
     };
+
+export type WsInputMessageType = WsInputMessage["type"];
 
 export type WsOutputMessage =
   | {
       type: "CHAT_STARTED";
-      name: string;
-      id: string;
+      payload: {
+        name: string;
+        id: string;
+      };
     }
   | {
       type: "CHAT_PARTIAL_REPLY";
-      chatId: string;
-      content: string;
+      payload: {
+        chatId: string;
+        content: string;
+      };
     }
   | {
       type: "CHAT_REPLY_FINISH";
-      chatId: string;
+      payload: {
+        chatId: string;
+      };
     }
   | {
       type: "CHAT_ERROR";
-      chatId: string;
-      error: string;
+      payload: {
+        chatId: string;
+        error: string;
+      };
     };
+
+export type WsOutputMessageType = WsOutputMessage["type"];

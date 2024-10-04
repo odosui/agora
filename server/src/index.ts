@@ -23,7 +23,7 @@ async function main() {
     next();
   });
 
-  // Serve static files or APIs
+  // Health check
   app.get("/", (_req, res) => {
     res.json({ status: "OK" });
   });
@@ -58,26 +58,32 @@ async function main() {
 
     const handlePartialReply = (msg: string, id: string) => {
       const msgObj: WsOutputMessage = {
-        chatId: id,
-        content: msg,
         type: "CHAT_PARTIAL_REPLY",
+        payload: {
+          chatId: id,
+          content: msg,
+        },
       };
       ws.send(JSON.stringify(msgObj));
     };
 
     const handleReplyFinish = (id: string) => {
       const msg: WsOutputMessage = {
-        chatId: id,
         type: "CHAT_REPLY_FINISH",
+        payload: {
+          chatId: id,
+        },
       };
       ws.send(JSON.stringify(msg));
     };
 
     const handleChatError = (id: string, error: string) => {
       const msg: WsOutputMessage = {
-        chatId: id,
         type: "CHAT_ERROR",
-        error,
+        payload: {
+          chatId: id,
+          error,
+        },
       };
       ws.send(JSON.stringify(msg));
     };
@@ -92,10 +98,10 @@ async function main() {
       const data = JSON.parse(messageStr) as WsInputMessage;
 
       if (data.type === "START_CHAT") {
-        const p = config?.profiles[data.profile];
+        const p = config?.profiles[data.payload.profile];
 
         if (!p) {
-          log("Error: Profile not found", { profile: data.profile });
+          log("Error: Profile not found", { profile: data.payload.profile });
           return;
         }
 
@@ -108,7 +114,7 @@ async function main() {
             p.system ?? DEFAULT_SYSTEM
           );
           chats[id] = {
-            profile: data.profile,
+            profile: data.payload.profile,
             messages: [],
             chat,
           };
@@ -122,7 +128,7 @@ async function main() {
             p.system ?? DEFAULT_SYSTEM
           );
           chats[id] = {
-            profile: data.profile,
+            profile: data.payload.profile,
             messages: [],
             chat,
           };
@@ -137,22 +143,25 @@ async function main() {
 
         const msg: WsOutputMessage = {
           type: "CHAT_STARTED",
-          name: data.profile,
-          id,
+
+          payload: {
+            name: data.payload.profile,
+            id,
+          },
         };
 
-        log("Chat started", { id, profile: data.profile });
+        log("Chat started", { id, profile: data.payload.profile });
         ws.send(JSON.stringify(msg));
         return;
       } else if (data.type === "POST_MESSAGE") {
-        const c = chats[data.chatId];
+        const c = chats[data.payload.chatId];
 
         if (!c) {
-          log("Error: Chat not found", { chatId: data.chatId });
+          log("Error: Chat not found", { chatId: data.payload.chatId });
           return;
         }
 
-        c.chat.postMessage(data.content, data.image);
+        c.chat.postMessage(data.payload.content, data.payload.image);
         return;
       } else {
         log("Error: Received message is not a valid type", { data });

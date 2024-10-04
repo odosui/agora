@@ -23,7 +23,10 @@ function App() {
 
   const handleWsMessage = useCallback((msg: WsOutputMessage) => {
     if (msg.type === "CHAT_STARTED") {
-      setChats((prev) => [...prev, { id: msg.id, name: msg.name }]);
+      setChats((prev) => [
+        ...prev,
+        { id: msg.payload.id, name: msg.payload.name },
+      ]);
     } else {
       // don't care
     }
