@@ -90,49 +90,10 @@ main.app {
   align-items: center;
 }
 
-.app .chat {
-  width: var(--u13);
-  min-width: var(--u13);
-  flex-basis: var(--u13);
-  flex: 0 0 auto;
-  background-color: #fff;
-  border-left: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
 .app .chat .messages {
   flex: 1;
   overflow-y: auto;
   padding: var(--u3);
-}
-
-.message-form {
-  margin-top: var(--u3);
-  height: var(--u8);
-  padding: var(--u2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--u1);
-  margin: 0 var(--u3) var(--u3) var(--u3);
-  display: flex;
-  flex-direction: column;
-}
-
-.message-form-main {
-  display: flex;
-  justify-content: space-between;
-  height: 100%;
-}
-
-.message-form-footer {
-  display: flex;
-  gap: var(--u2);
-  align-items: center;
-}
-
-.message-form-footer .attached {
-  width: var(--u7);
 }
 
 .attach-wrapper {
@@ -163,33 +124,60 @@ main.app {
   border-radius: var(--u0);
 }
 
-.message-form textarea {
-  width: 100%;
-  height: 100%;
-  font-size: 1em;
-  font-family: inherit;
-  resize: none;
-  border: none;
-  flex: 1;
-}
+.message-form {
+  margin-top: var(--u3);
+  height: var(--u8);
+  padding: var(--u3) var(--u2);
+  border-top: 1px solid var(--color-border);
+  // border-radius: var(--u1);
+  // margin: 0 var(--u3) var(--u3) var(--u3);
+  display: flex;
+  flex-direction: column;
 
-.message-form button {
-  background-color: var(--color-bg);
-  font-weight: 500;
-  text-transform: uppercase;
-  margin-left: var(--u2);
-  height: 100%;
-  width: var(--u8);
-}
+  .message-form-main {
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+  }
 
-.message-form button:hover {
-  outline: none;
-  background-color: var(--color-bg-alt);
-}
+  .message-form-footer {
+    display: flex;
+    gap: var(--u2);
+    align-items: center;
+  }
 
-.message-form button:disabled {
-  background-color: var(--color-bg-alt);
-  cursor: not-allowed;
+  .message-form-footer .attached {
+    width: var(--u7);
+  }
+
+  textarea {
+    width: 100%;
+    height: 100%;
+    font-size: 1em;
+    font-family: inherit;
+    resize: none;
+    border: none;
+    flex: 1;
+  }
+
+  button {
+    background-color: var(--color-bg);
+    font-weight: 500;
+    text-transform: uppercase;
+    margin-left: var(--u2);
+    height: 100%;
+    width: var(--u8);
+  }
+
+  button:hover {
+    outline: none;
+    background-color: var(--color-bg-alt);
+  }
+
+  button:disabled {
+    background-color: var(--color-bg-alt);
+    cursor: not-allowed;
+  }
 }
 
 textarea:focus {
@@ -278,6 +266,19 @@ li p {
 }
 
 .chat {
+  margin-top: var(--u3);
+  margin-bottom: var(--u3);
+  border-radius: var(--u1);
+  width: var(--u13);
+  min-width: var(--u13);
+  flex-basis: var(--u13);
+  flex: 0 0 auto;
+  background-color: #fff;
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
   .chat-title {
     position: absolute;
     top: var(--u2);

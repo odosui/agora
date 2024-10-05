@@ -129,11 +129,12 @@ const Chat: React.FC<{
 
       <button
         className="closeChat"
-        role="button"
+        title="Delete chat"
         aria-label="Delete chat"
-        onClick={handleDeleteChat}
         aria-hidden="true"
         aria-disabled={waitingTillReplyFinish}
+        onClick={handleDeleteChat}
+        disabled={waitingTillReplyFinish}
       >
         x
       </button>
