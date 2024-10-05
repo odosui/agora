@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 
 type ConfigFile = {
+  database_url: string;
   openai_key: string;
   anthropic_key: string;
   profiles: Record<

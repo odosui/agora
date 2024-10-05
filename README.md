@@ -29,10 +29,13 @@ npm install
 
 ## Usage
 
+Agora requires a PostgreSQL database to store chat logs. You can install it locally or use a cloud service. The database url must be provided in the configuration file.
+
 Create a configuration file at `server/config.json` that looks like this:
 
 ```json
 {
+  "database_url": "postgresql://agora:<YOUR_PASSWORD>@localhost:5432/agora",
   "openai_key": "<YOUR_OPENAI_KEY>",
   "anthropic_key": "<YOUR_ANTHROPIC_KEY>",
   "profiles": {
