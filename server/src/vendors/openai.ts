@@ -3,6 +3,8 @@ import OpenAI from "openai";
 type ChatCompletionMessageParam =
   OpenAI.Chat.Completions.ChatCompletionMessageParam;
 
+const STREAMING_NOT_SUPPORTED_MODELS = ["o1-preview", "o1-mini"];
+
 export class OpenAiChat {
   private model: string;
 
@@ -14,37 +16,56 @@ export class OpenAiChat {
 
   constructor(apiKey: string, model: string, systemMsg: string) {
     this.model = model;
-    this.messages.push(system(systemMsg));
+    if (!STREAMING_NOT_SUPPORTED_MODELS.includes(model)) {
+      this.messages.push(system(systemMsg));
+    }
     this.client = new OpenAI({ apiKey });
   }
 
   async postMessage(input: string, _file?: { data: string; type: string }) {
     this.messages.push(user(input));
 
-    const stream = await this.client.chat.completions.create({
-      model: this.model,
-      messages: this.messages,
-      stream: true,
-    });
+    // models like o1-preview and o1-mini do not support streaming
+    if (STREAMING_NOT_SUPPORTED_MODELS.includes(this.model)) {
+      const result = await this.client.chat.completions.create({
+        model: this.model,
+        messages: this.messages,
+      });
 
-    let msg = "";
+      const msg = result.choices[0]?.message?.content || "";
+      this.messages.push(assistant(msg));
 
-    for await (const part of stream) {
-      // collect regular message
-      const p = part.choices[0]?.delta?.content || "";
-      if (p) {
-        // notify listeners
-        this.listeners.forEach((listener) => listener(p));
-        msg += p;
+      // notify listeners
+      this.listeners.forEach((l) => l(msg));
+      this.finishListeners.forEach((l) => l());
+    } else {
+      const stream = await this.client.chat.completions.create({
+        model: this.model,
+        messages: this.messages,
+        stream: true,
+      });
+
+      let msg = "";
+
+      for await (const part of stream) {
+        // collect regular message
+        const p = part.choices[0]?.delta?.content || "";
+        if (p) {
+          // notify listeners
+          this.listeners.forEach((listener) => listener(p));
+          msg += p;
+        }
       }
+
+      stream.controller.abort();
+      this.messages.push(assistant(msg));
+
+      // notify listeners
+      this.finishListeners.forEach((l) => l());
     }
-
-    stream.controller.abort();
-    this.messages.push(assistant(msg));
-
-    // notify listeners
-    this.finishListeners.forEach((l) => l());
   }
+
+  // listeners
 
   onPartialReply(listener: (msg: string) => void) {
     this.listeners.push(listener);
@@ -52,6 +73,10 @@ export class OpenAiChat {
 
   onReplyFinish(l: () => void) {
     this.finishListeners.push(l);
+  }
+
+  onError(l: (err: string) => void) {
+    // TODO: implement error handling
   }
 }
 

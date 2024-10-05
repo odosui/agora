@@ -107,39 +107,23 @@ async function main() {
 
         const id = v4();
 
-        if (p.vendor === "openai") {
-          const chat = new OpenAiChat(
-            config.openai_key,
-            p.model,
-            p.system ?? DEFAULT_SYSTEM
-          );
-          chats[id] = {
-            profile: data.payload.profile,
-            messages: [],
-            chat,
-          };
+        const Chat = p.vendor === "openai" ? OpenAiChat : AnthropicChat;
 
-          chat.onPartialReply((m) => handlePartialReply(m, id));
-          chat.onReplyFinish(() => handleReplyFinish(id));
-        } else if (p.vendor === "anthropic") {
-          const chat = new AnthropicChat(
-            config.anthropic_key,
-            p.model,
-            p.system ?? DEFAULT_SYSTEM
-          );
-          chats[id] = {
-            profile: data.payload.profile,
-            messages: [],
-            chat,
-          };
+        const chat = new Chat(
+          p.vendor === "openai" ? config.openai_key : config.anthropic_key,
+          p.model,
+          p.system ?? DEFAULT_SYSTEM
+        );
 
-          chat.onPartialReply((m) => handlePartialReply(m, id));
-          chat.onReplyFinish(() => handleReplyFinish(id));
-          chat.onError((err) => handleChatError(id, err));
-        } else {
-          log("Error: Vendor not supported", { vendor: p.vendor });
-          return;
-        }
+        chats[id] = {
+          profile: data.payload.profile,
+          messages: [],
+          chat,
+        };
+
+        chat.onPartialReply((m) => handlePartialReply(m, id));
+        chat.onReplyFinish(() => handleReplyFinish(id));
+        chat.onError((err) => handleChatError(id, err));
 
         const msg: WsOutputMessage = {
           type: "CHAT_STARTED",

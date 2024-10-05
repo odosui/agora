@@ -50,6 +50,8 @@ export class AnthropicChat {
       });
   }
 
+  // listeners
+
   onPartialReply(listener: (msg: string) => void) {
     this.listeners.push(listener);
   }
