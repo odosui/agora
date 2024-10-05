@@ -1,30 +1,91 @@
-# React + TypeScript + Vite
+# Agora
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Chat with multiple AI models at once.
 
-Currently, two official plugins are available:
+<br>
+<p>
+  <div>
+    <img src="img/agora.png" width="100%" alt="Agora Screenshot" />
+  </div>
+</p>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+<br>
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+⚡ Chat with multiple AI models at once
+⚡ No extra dependencies required
+⚡ OpenAI and Anthropic models supported
+⚡ The new `o1-mini`, and `o1-preview` models are supported. But they don't allow streaming.
 
-- Configure the top-level `parserOptions` property like this:
+## Installation
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
+Both `server` and `client` dependencies need to be installed.
+
+```bash
+cd server
+npm install
+
+cd ../client
+npm install
+```
+
+## Usage
+
+Create a configuration file at `server/config.json` that looks like this:
+
+```json
+{
+  "openai_key": "<YOUR_OPENAI_KEY>",
+  "anthropic_key": "<YOUR_ANTHROPIC_KEY>",
+  "profiles": {
+    "o1-preview": {
+      "vendor": "openai",
+      "model": "o1-preview"
+    },
+    "o1-mini": {
+      "vendor": "openai",
+      "model": "o1-mini"
+    },
+    "GPT-4o": {
+      "vendor": "openai",
+      "model": "gpt-4o"
+    },
+    "GPT-4": {
+      "vendor": "openai",
+      "model": "gpt-4"
+    },
+    "GPT-3.5-turbo": {
+      "vendor": "openai",
+      "model": "gpt-3.5-turbo"
+    },
+    "claude-3-opus": {
+      "vendor": "anthropic",
+      "model": "claude-3-opus-20240229"
+    },
+    "claude-3-sonnet": {
+      "vendor": "anthropic",
+      "model": "claude-3-sonnet-20240229"
+    },
+    "claude-3-5-sonnet": {
+      "vendor": "anthropic",
+      "model": "claude-3-5-sonnet-20240620"
+    },
+    // Add more models here
+  }
 }
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Start the server:
+
+```bash
+cd server
+npm run dev
+```
+
+Start the client:
+
+```bash
+cd client
+npm run dev
+```
