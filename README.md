@@ -10,10 +10,10 @@ Chat with multiple AI models at once.
 
 ## Features
 
-⚡ Chat with multiple AI models at once
-⚡ No extra dependencies required
-⚡ OpenAI and Anthropic models supported
-⚡ The new `o1-mini`, and `o1-preview` models are supported. But they don't allow streaming.
+- ⚡ Chat with multiple AI models at once
+- ⚡ No extra dependencies required
+- ⚡ OpenAI and Anthropic models supported
+- ⚡ The new `o1-mini`, and `o1-preview` models are supported. But they don't allow streaming.
 
 ## Installation
 
