@@ -32,7 +32,11 @@
   --color-bg: #f1f1f1;
   --color-bg-alt: #e0e0e0;
   --color-border: #e0e0e0;
+
   --color-main: #646cff;
+  --color-main-intense: #535bf2;
+  --color-main-bleak: #a3a3ff;
+
   --color-text: #333;
   --color-text-light: #666;
 }
@@ -59,8 +63,12 @@ h1 {
   line-height: 1.1;
 }
 
+input[type="text"] {
+  outline: none;
+}
+
 button {
-  border-radius: 8px;
+  border-radius: var(--u1);
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
@@ -68,6 +76,20 @@ button {
   font-family: inherit;
   cursor: pointer;
   transition: background-color 0.25s;
+
+  &.primary {
+    background-color: var(--color-main);
+    color: white;
+
+    &:hover {
+      background-color: var(--color-main-intense);
+    }
+
+    &:disabled {
+      background-color: var(--color-main-bleak);
+      cursor: not-allowed;
+    }
+  }
 }
 
 main.app {
@@ -368,6 +390,66 @@ li p {
     h3 {
       font-size: 1.2em;
       margin-bottom: var(--u1);
+    }
+  }
+}
+
+.home-page {
+  margin: var(--u5) auto;
+  max-width: var(--u17);
+
+  h1 {
+    font-weight: 400;
+  }
+
+  .dashboard-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--u3);
+  }
+
+  .dashboard {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    padding: var(--u3);
+    border-radius: var(--u1);
+    width: var(--u10);
+    height: var(--u8);
+    margin-bottom: var(--u5);
+    border: 1px solid var(--color-border);
+    // transition: background-color 0.25s;
+    // &:hover {
+    //   background-color: var(--color-bg-alt);
+    // }
+
+    h3 {
+      margin: 0;
+      font-weight: 400;
+      font-size: 1.6em;
+      color: var(--color-text-light);
+      margin-bottom: var(--u1);
+    }
+  }
+
+  .db-form {
+    display: flex;
+    flex-direction: row;
+    gap: var(--u2);
+    width: 100%;
+    max-width: var(--u12);
+    background-color: white;
+    padding: var(--u3);
+    border-radius: var(--u1);
+
+    input {
+      padding: var(--u2);
+      border-radius: var(--u1);
+      border: 1px solid var(--color-border);
+      font-size: 1em;
+      flex: 1;
     }
   }
 }

@@ -2,6 +2,7 @@ import express from "express";
 import { v4 } from "uuid";
 import { WsInputMessage, WsOutputMessage } from "../../shared/types";
 import ConfigFile from "./config_file";
+import Dashboards, { Dashboard, dbToDto } from "./db/models/dashboards";
 import { startWsServer } from "./framework/wsst";
 import { log } from "./utils";
 import { AnthropicChat } from "./vendors/anthropic";
@@ -16,6 +17,8 @@ async function main() {
   const config: ConfigFile | null = await ConfigFile.readConfig();
 
   const app = express();
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
   // allow CORS
   app.use((_req, res, next) => {
@@ -40,6 +43,56 @@ async function main() {
     } catch (error) {
       res.status(500).json({ error: "Internal server error" });
     }
+  });
+
+  app.get("/api/dashboards", async (_req, res) => {
+    try {
+      const dbs = await Dashboards.all();
+      res.json(dbs.map(dbToDto));
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
+  });
+
+  app.post("/api/dashboards", async (req, res) => {
+    try {
+      const { name } = req.body;
+
+      if (!name) {
+        res.status(400).json({ error: "Name is required" });
+        return;
+      }
+
+      const db = await Dashboards.create(name);
+      res.json(dbToDto(db));
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
+  });
+
+  app.get("/api/dashboards/:id", async (req, res) => {
+    const id = req.params.id;
+
+    let db: Dashboard | null = null;
+
+    try {
+      db = await Dashboards.findByUuid(id);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
+
+    if (!db) {
+      res.status(404).json({ error: "Dashboard not found" });
+      return;
+    }
+
+    res.json(dbToDto(db));
   });
 
   const server = app.listen(PORT, () => {

@@ -1,6 +1,6 @@
 const api = {
   get,
-  // post,
+  post,
   // put,
   // del,
   // patch,
@@ -47,9 +47,9 @@ function get<T>(url: string, params?: { [k: string]: string }): Promise<T> {
 //   return res;
 // }
 
-// function post<T>(url: string, payload?: object) {
-//   return apic<T>("POST", url, payload);
-// }
+function post<T>(url: string, payload?: object) {
+  return apic<T>("POST", url, payload);
+}
 
 // function put<T>(url: string, payload?: object) {
 //   return apic<T>("PUT", url, payload);

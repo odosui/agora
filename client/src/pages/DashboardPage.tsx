@@ -1,14 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
-import Chat from "./Chat";
-import api from "./api";
-import { useWs } from "./useWs";
-import { WsOutputMessage } from "../../shared/types";
-import { ChatData, Profile } from "./types";
-import ChatStarter from "./components/ChatStarter";
+import { WsOutputMessage } from "../../../shared/types";
+import Chat from "../Chat";
+import api from "../api";
+import ChatStarter from "../components/ChatStarter";
+import { ChatData, Dashboard, Profile } from "../types";
+import { useWs } from "../useWs";
+import { useParams } from "react-router-dom";
 
-function App() {
+function DashboardPage() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [chats, setChats] = useState<ChatData[]>([]);
+
+  const params = useParams<{ id: string }>();
+  console.log(params);
 
   const { lastMessage, deleteChat } = useWs();
 
@@ -44,6 +48,15 @@ function App() {
     fetchProfiles();
   }, []);
 
+  useEffect(() => {
+    async function fetchDb() {
+      const data = await api.get<Dashboard[]>(`/dashboards/${params.id}`);
+      console.log(data);
+    }
+
+    fetchDb();
+  }, [params.id]);
+
   return (
     <main className={`app ${chats.length === 0 ? "no-chats" : ""}`}>
       {chats.map((chat) => (
@@ -59,4 +72,4 @@ function App() {
   );
 }
 
-export default App;
+export default DashboardPage;
