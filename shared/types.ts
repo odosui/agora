@@ -15,6 +15,12 @@ export type WsInputMessage =
       payload: {
         profile: string;
       };
+    }
+  | {
+      type: "DELETE_CHAT";
+      payload: {
+        chatId: string;
+      };
     };
 
 export type WsInputMessageType = WsInputMessage["type"];

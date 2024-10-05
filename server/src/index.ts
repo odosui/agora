@@ -147,6 +147,17 @@ async function main() {
 
         c.chat.postMessage(data.payload.content, data.payload.image);
         return;
+      } else if (data.type === "DELETE_CHAT") {
+        const c = chats[data.payload.chatId];
+
+        if (!c) {
+          log("Error: Chat not found", { chatId: data.payload.chatId });
+          return;
+        }
+
+        delete chats[data.payload.chatId];
+        // TODO: c.chat.destroy(); ?
+        return;
       } else {
         log("Error: Received message is not a valid type", { data });
         return;

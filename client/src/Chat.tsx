@@ -15,7 +15,8 @@ type Message = {
 const Chat: React.FC<{
   id: string;
   name: string;
-}> = ({ id, name }) => {
+  onDelete: () => void;
+}> = ({ id, name, onDelete }) => {
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [waitingTillReplyFinish, setWaitingTillReplyFinish] =
@@ -31,6 +32,11 @@ const Chat: React.FC<{
 
   const taRef = useRef<HTMLTextAreaElement>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
+
+  const handleDeleteChat = () => {
+    if (!confirm("Are you sure you want to delete this chat?")) return;
+    onDelete();
+  };
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,6 +126,17 @@ const Chat: React.FC<{
   return (
     <div className="chat">
       <div className="chat-title">{name}</div>
+
+      <button
+        className="closeChat"
+        role="button"
+        aria-label="Delete chat"
+        onClick={handleDeleteChat}
+        aria-hidden="true"
+        aria-disabled={waitingTillReplyFinish}
+      >
+        x
+      </button>
 
       <div className="messages" ref={messagesRef}>
         {messages.map((m, i) => (

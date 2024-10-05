@@ -16,7 +16,17 @@ export function useWs() {
       },
     };
 
-    console.log("Starting chat", e);
+    sendJsonMessage(e);
+  };
+
+  const deleteChat = (chatId: string) => {
+    const e: WsInputMessage = {
+      type: "DELETE_CHAT",
+      payload: {
+        chatId,
+      },
+    };
+
     sendJsonMessage(e);
   };
 
@@ -45,5 +55,6 @@ export function useWs() {
     startChat,
     lastMessage,
     readyState,
+    deleteChat,
   };
 }

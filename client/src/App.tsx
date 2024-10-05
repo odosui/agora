@@ -10,7 +10,7 @@ function App() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [chats, setChats] = useState<ChatData[]>([]);
 
-  const { lastMessage } = useWs();
+  const { lastMessage, deleteChat } = useWs();
 
   const handleWsMessage = useCallback((msg: WsOutputMessage) => {
     if (msg.type === "CHAT_STARTED") {
@@ -21,6 +21,11 @@ function App() {
     } else {
       // don't care
     }
+  }, []);
+
+  const handleDeleteChat = useCallback((id: string) => {
+    deleteChat(id);
+    setChats((prev) => prev.filter((chat) => chat.id !== id));
   }, []);
 
   useEffect(() => {
@@ -42,7 +47,12 @@ function App() {
   return (
     <main className={`app ${chats.length === 0 ? "no-chats" : ""}`}>
       {chats.map((chat) => (
-        <Chat key={chat.id} id={chat.id} name={chat.name} />
+        <Chat
+          key={chat.id}
+          id={chat.id}
+          name={chat.name}
+          onDelete={() => handleDeleteChat(chat.id)}
+        />
       ))}
       {profiles && <ChatStarter profiles={profiles} />}
     </main>
