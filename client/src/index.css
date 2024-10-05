@@ -332,3 +332,11 @@ li p {
 .chat-starter ul li button:hover {
   background-color: var(--color-bg-alt);
 }
+
+.chat-starter-vendor {
+  margin-bottom: var(--u1);
+  h3 {
+    font-size: 1.2em;
+    margin-bottom: var(--u1);
+  }
+}

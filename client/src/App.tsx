@@ -3,17 +3,8 @@ import Chat from "./Chat";
 import api from "./api";
 import { useWs } from "./useWs";
 import { WsOutputMessage } from "../../shared/types";
-
-type Profile = {
-  name: string;
-  vendor: string;
-  model: string;
-};
-
-type ChatData = {
-  id: string;
-  name: string;
-};
+import { ChatData, Profile } from "./types";
+import ChatStarter from "./components/ChatStarter";
 
 function App() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -59,22 +50,3 @@ function App() {
 }
 
 export default App;
-
-const ChatStarter = ({ profiles }: { profiles: Profile[] }) => {
-  const { startChat } = useWs();
-
-  return (
-    <div className="chat-starter">
-      <h2>Start a new chat</h2>
-      <ul>
-        {profiles.map((profile) => (
-          <li key={profile.name}>
-            <button onClick={() => startChat(profile.name)}>
-              {profile.name}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
