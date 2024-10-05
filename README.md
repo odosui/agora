@@ -5,7 +5,7 @@ Chat with multiple AI models at once.
 <br>
 <p>
   <div>
-    <img src="img/agora.png" width="100%" alt="Agora Screenshot" />
+    <img src="./img/agora.png" width="100%" alt="Agora Screenshot" />
   </div>
 </p>
 
