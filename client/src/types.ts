@@ -3,8 +3,3 @@ export type Profile = {
   vendor: string;
   model: string;
 };
-
-export type ChatData = {
-  id: string;
-  name: string;
-};

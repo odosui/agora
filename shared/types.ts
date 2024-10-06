@@ -1,3 +1,5 @@
+import { ChatDto } from "../server/src/db/models/chats";
+
 export type WsInputMessage =
   | {
       type: "POST_MESSAGE";
@@ -24,15 +26,10 @@ export type WsInputMessage =
       };
     };
 
-export type WsInputMessageType = WsInputMessage["type"];
-
 export type WsOutputMessage =
   | {
       type: "CHAT_STARTED";
-      payload: {
-        name: string;
-        id: string;
-      };
+      payload: ChatDto;
     }
   | {
       type: "CHAT_PARTIAL_REPLY";
@@ -60,5 +57,3 @@ export type WsOutputMessage =
         error: string;
       };
     };
-
-export type WsOutputMessageType = WsOutputMessage["type"];

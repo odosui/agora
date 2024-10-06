@@ -32,6 +32,8 @@ export function chatDto(c: Chat) {
   };
 }
 
+export type ChatDto = ReturnType<typeof chatDto>;
+
 async function create(name: string, dashboardId: number, profileName: string) {
   const res = await queryAndLog<Chat>(
     `INSERT INTO chats (name, dashboard_id, profile_name) VALUES ($1, $2, $3) RETURNING ${fieldsStr}`,
@@ -59,11 +61,7 @@ async function allByDashboard(dbId: number) {
     [dbId]
   );
 
-  if (res.rows.length === 0) {
-    return null;
-  }
-
-  return res.rows[0];
+  return res.rows;
 }
 
 const Chats = {

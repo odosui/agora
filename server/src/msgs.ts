@@ -3,6 +3,7 @@
  */
 
 import { WsOutputMessage } from "../../shared/types";
+import { ChatDto } from "./db/models/chats";
 
 function partialReply(id: string, content: string): WsOutputMessage {
   return {
@@ -42,13 +43,10 @@ function chatError(id: string, error: string): WsOutputMessage {
   };
 }
 
-function chatStarted(id: string, profile: string): WsOutputMessage {
+function chatStarted(chat: ChatDto): WsOutputMessage {
   return {
     type: "CHAT_STARTED",
-    payload: {
-      name: profile,
-      id,
-    },
+    payload: chat,
   };
 }
 
