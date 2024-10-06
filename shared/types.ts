@@ -14,6 +14,7 @@ export type WsInputMessage =
       type: "START_CHAT";
       payload: {
         profile: string;
+        dbUuid: string;
       };
     }
   | {
@@ -50,6 +51,12 @@ export type WsOutputMessage =
       type: "CHAT_ERROR";
       payload: {
         chatId: string;
+        error: string;
+      };
+    }
+  | {
+      type: "GENERAL_ERROR";
+      payload: {
         error: string;
       };
     };

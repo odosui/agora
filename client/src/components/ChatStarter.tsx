@@ -1,7 +1,10 @@
 import { Profile } from "../types";
 import { useWs } from "../useWs";
 
-const ChatStarter: React.FC<{ profiles: Profile[] }> = ({ profiles }) => {
+const ChatStarter: React.FC<{ profiles: Profile[]; dbUuid: string }> = ({
+  profiles,
+  dbUuid,
+}) => {
   const { startChat } = useWs();
 
   const groupped = profiles.reduce((acc, profile) => {
@@ -22,7 +25,7 @@ const ChatStarter: React.FC<{ profiles: Profile[] }> = ({ profiles }) => {
             <ul>
               {profiles.map((profile) => (
                 <li key={profile.name}>
-                  <button onClick={() => startChat(profile.name)}>
+                  <button onClick={() => startChat(profile.name, dbUuid)}>
                     {profile.name}
                   </button>
                 </li>

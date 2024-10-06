@@ -76,7 +76,6 @@ async function applyMigration(client: Client, migrationFile: string) {
     await client.query("INSERT INTO migrations (migration_file) VALUES ($1)", [
       path.basename(migrationFile),
     ]);
-    console.log(`Applied migration: ${migrationFile}`);
   } catch (err: any) {
     throw new Error(
       `Error applying migration ${migrationFile}: ${err.message}`

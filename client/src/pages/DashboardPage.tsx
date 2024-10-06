@@ -1,19 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { DashboardDto } from "../../../server/src/db/models/dashboards";
 import { WsOutputMessage } from "../../../shared/types";
 import Chat from "../Chat";
 import api from "../api";
 import ChatStarter from "../components/ChatStarter";
-import { ChatData, Dashboard, Profile } from "../types";
+import { ChatData, Profile } from "../types";
 import { useWs } from "../useWs";
-import { useParams } from "react-router-dom";
 
 function DashboardPage() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [chats, setChats] = useState<ChatData[]>([]);
-
   const params = useParams<{ id: string }>();
-  console.log(params);
-
   const { lastMessage, deleteChat } = useWs();
 
   const handleWsMessage = useCallback((msg: WsOutputMessage) => {
@@ -27,10 +25,13 @@ function DashboardPage() {
     }
   }, []);
 
-  const handleDeleteChat = useCallback((id: string) => {
-    deleteChat(id);
-    setChats((prev) => prev.filter((chat) => chat.id !== id));
-  }, []);
+  const handleDeleteChat = useCallback(
+    (id: string) => {
+      deleteChat(id);
+      setChats((prev) => prev.filter((chat) => chat.id !== id));
+    },
+    [deleteChat]
+  );
 
   useEffect(() => {
     if (lastMessage !== null) {
@@ -49,13 +50,21 @@ function DashboardPage() {
   }, []);
 
   useEffect(() => {
+    if (!params.id) {
+      return;
+    }
+
     async function fetchDb() {
-      const data = await api.get<Dashboard[]>(`/dashboards/${params.id}`);
+      const data = await api.get<DashboardDto[]>(`/dashboards/${params.id}`);
       console.log(data);
     }
 
     fetchDb();
   }, [params.id]);
+
+  if (!params.id) {
+    return null;
+  }
 
   return (
     <main className={`app ${chats.length === 0 ? "no-chats" : ""}`}>
@@ -67,7 +76,7 @@ function DashboardPage() {
           onDelete={() => handleDeleteChat(chat.id)}
         />
       ))}
-      {profiles && <ChatStarter profiles={profiles} />}
+      {profiles && <ChatStarter profiles={profiles} dbUuid={params.id} />}
     </main>
   );
 }

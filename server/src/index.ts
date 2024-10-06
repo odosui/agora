@@ -1,12 +1,13 @@
 import express from "express";
-import { v4 } from "uuid";
-import { WsInputMessage, WsOutputMessage } from "../../shared/types";
+import { WsInputMessage } from "../../shared/types";
 import ConfigFile from "./config_file";
+import Chats from "./db/models/chats";
 import Dashboards, { Dashboard, dbToDto } from "./db/models/dashboards";
 import { startWsServer } from "./framework/wsst";
 import { log } from "./utils";
 import { AnthropicChat } from "./vendors/anthropic";
 import { OpenAiChat } from "./vendors/openai";
+import msgs from "./msgs";
 
 const DEFAULT_SYSTEM =
   "You are a helpful assistant. You answer concisely and to the point.";
@@ -113,36 +114,43 @@ async function main() {
         return;
       }
 
-      const id = v4();
+      const db = await Dashboards.findByUuid(payload.dbUuid);
 
-      const Chat = p.vendor === "openai" ? OpenAiChat : AnthropicChat;
+      if (!db) {
+        log("Error: Dashboard not found", { dbUuid: payload.dbUuid });
+        sendMsg(msgs.generalError("Dashboard not found"));
+        return;
+      }
 
-      const chat = new Chat(
+      const c = await Chats.create("New Chat", db.id, payload.profile);
+      const ChatEngine = p.vendor === "openai" ? OpenAiChat : AnthropicChat;
+
+      const chat = new ChatEngine(
         p.vendor === "openai" ? config.openai_key : config.anthropic_key,
         p.model,
         p.system ?? DEFAULT_SYSTEM
       );
 
-      chats[id] = {
+      chats[c.uuid] = {
         profile: payload.profile,
         messages: [],
         chat,
       };
 
       chat.onPartialReply((msg) => {
-        sendMsg(partialReply(id, msg));
+        sendMsg(msgs.partialReply(c.uuid, msg));
       });
 
       chat.onReplyFinish(() => {
-        sendMsg(replyFinish(id));
+        sendMsg(msgs.replyFinish(c.uuid));
       });
 
       chat.onError((err) => {
-        sendMsg(chatError(id, err));
+        sendMsg(msgs.chatError(c.uuid, err));
       });
 
-      log("Chat started", { id, profile: payload.profile });
-      sendMsg(chatStarted(id, payload.profile));
+      log("Chat started", { uuid: c.uuid, profile: payload.profile });
+      sendMsg(msgs.chatStarted(c.uuid, payload.profile));
       return;
     })
     .on("POST_MESSAGE", async (payload) => {
@@ -175,44 +183,3 @@ async function main() {
 }
 
 main();
-
-// message helpers
-
-function partialReply(id: string, content: string): WsOutputMessage {
-  return {
-    type: "CHAT_PARTIAL_REPLY",
-    payload: {
-      chatId: id,
-      content,
-    },
-  };
-}
-
-function replyFinish(id: string): WsOutputMessage {
-  return {
-    type: "CHAT_REPLY_FINISH",
-    payload: {
-      chatId: id,
-    },
-  };
-}
-
-function chatError(id: string, error: string): WsOutputMessage {
-  return {
-    type: "CHAT_ERROR",
-    payload: {
-      chatId: id,
-      error,
-    },
-  };
-}
-
-function chatStarted(id: string, profile: string): WsOutputMessage {
-  return {
-    type: "CHAT_STARTED",
-    payload: {
-      name: profile,
-      id,
-    },
-  };
-}

@@ -1,8 +1,9 @@
-import { pgClient } from "../pool";
+import { queryAndLog } from "../pool";
 
-const fields = ["uuid", "name", "created_at", "updated_at"].join(", ");
+const fields = ["id", "uuid", "name", "created_at", "updated_at"].join(", ");
 
 export type Dashboard = {
+  id: number;
   uuid: string;
   name: string;
   created_at: Date;
@@ -18,9 +19,10 @@ export function dbToDto(db: Dashboard) {
   };
 }
 
+export type DashboardDto = ReturnType<typeof dbToDto>;
+
 async function create(name: string) {
-  const client = await pgClient();
-  const res = await client.query<Dashboard>(
+  const res = await queryAndLog<Dashboard>(
     `INSERT INTO dashboards (name) VALUES ($1) RETURNING ${fields}`,
     [name]
   );
@@ -28,8 +30,7 @@ async function create(name: string) {
 }
 
 async function all() {
-  const client = await pgClient();
-  const res = await client.query<Dashboard>(
+  const res = await queryAndLog<Dashboard>(
     `SELECT ${fields} FROM dashboards ORDER BY ID DESC`
   );
 
@@ -37,8 +38,7 @@ async function all() {
 }
 
 async function findByUuid(uuid: string) {
-  const client = await pgClient();
-  const res = await client.query<Dashboard>(
+  const res = await queryAndLog<Dashboard>(
     `SELECT ${fields} FROM dashboards WHERE uuid = $1`,
     [uuid]
   );

@@ -8,8 +8,3 @@ export type ChatData = {
   id: string;
   name: string;
 };
-
-export type Dashboard = {
-  uuid: string;
-  name: string;
-};

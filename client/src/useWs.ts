@@ -8,11 +8,12 @@ export function useWs() {
     share: true,
   });
 
-  const startChat = (profile: string) => {
+  const startChat = (profile: string, dbUuid: string) => {
     const e: WsInputMessage = {
       type: "START_CHAT",
       payload: {
         profile,
+        dbUuid,
       },
     };
 
