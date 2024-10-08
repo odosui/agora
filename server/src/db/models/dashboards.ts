@@ -1,6 +1,4 @@
-import { queryAndLog } from "../pool";
-
-const fields = ["id", "uuid", "name", "created_at", "updated_at"].join(", ");
+import { createModel } from "../create_model";
 
 export type Dashboard = {
   id: number;
@@ -9,6 +7,16 @@ export type Dashboard = {
   created_at: Date;
   updated_at: Date;
 };
+
+const fields: (keyof Dashboard)[] = [
+  "id",
+  "uuid",
+  "name",
+  "created_at",
+  "updated_at",
+];
+
+const Dashboards = createModel<Dashboard>("dashboards", fields);
 
 export function dbToDto(db: Dashboard) {
   return {
@@ -20,40 +28,5 @@ export function dbToDto(db: Dashboard) {
 }
 
 export type DashboardDto = ReturnType<typeof dbToDto>;
-
-async function create(name: string) {
-  const res = await queryAndLog<Dashboard>(
-    `INSERT INTO dashboards (name) VALUES ($1) RETURNING ${fields}`,
-    [name]
-  );
-  return res.rows[0];
-}
-
-async function all() {
-  const res = await queryAndLog<Dashboard>(
-    `SELECT ${fields} FROM dashboards ORDER BY ID DESC`
-  );
-
-  return res.rows;
-}
-
-async function findByUuid(uuid: string) {
-  const res = await queryAndLog<Dashboard>(
-    `SELECT ${fields} FROM dashboards WHERE uuid = $1`,
-    [uuid]
-  );
-
-  if (res.rows.length === 0) {
-    return null;
-  }
-
-  return res.rows[0];
-}
-
-const Dashboards = {
-  findByUuid,
-  all,
-  create,
-};
 
 export default Dashboards;

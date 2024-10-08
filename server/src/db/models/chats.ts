@@ -1,4 +1,4 @@
-import { queryAndLog } from "../pool";
+import { createModel } from "../create_model";
 
 export type Chat = {
   id: number;
@@ -20,7 +20,7 @@ const fields: (keyof Chat)[] = [
   "dashboard_id",
 ];
 
-const fieldsStr = fields.join(", ");
+const Chats = createModel<Chat>("chats", fields);
 
 export function chatDto(c: Chat) {
   return {
@@ -33,41 +33,5 @@ export function chatDto(c: Chat) {
 }
 
 export type ChatDto = ReturnType<typeof chatDto>;
-
-async function create(name: string, dashboardId: number, profileName: string) {
-  const res = await queryAndLog<Chat>(
-    `INSERT INTO chats (name, dashboard_id, profile_name) VALUES ($1, $2, $3) RETURNING ${fieldsStr}`,
-    [name, dashboardId, profileName]
-  );
-  return res.rows[0];
-}
-
-async function findByUuid(uuid: string) {
-  const res = await queryAndLog<Chat>(
-    `SELECT ${fieldsStr} FROM chats WHERE uuid = $1`,
-    [uuid]
-  );
-
-  if (res.rows.length === 0) {
-    return null;
-  }
-
-  return res.rows[0];
-}
-
-async function allByDashboard(dbId: number) {
-  const res = await queryAndLog<Chat>(
-    `SELECT ${fieldsStr} FROM chats WHERE dashboard_id = $1`,
-    [dbId]
-  );
-
-  return res.rows;
-}
-
-const Chats = {
-  create,
-  findByUuid,
-  allByDashboard,
-};
 
 export default Chats;

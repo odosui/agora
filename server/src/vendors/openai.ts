@@ -12,13 +12,19 @@ export class OpenAiChat {
   private messages: ChatCompletionMessageParam[] = [];
 
   private listeners: ((msg: string) => void)[] = [];
-  private finishListeners: (() => void)[] = [];
+  private finishListeners: ((finishedMessage: string) => void)[] = [];
 
-  constructor(apiKey: string, model: string, systemMsg: string) {
+  constructor(
+    apiKey: string,
+    model: string,
+    systemMsg: string,
+    msgs: { role: "assistant" | "user"; content: string }[] = []
+  ) {
     this.model = model;
     if (!STREAMING_NOT_SUPPORTED_MODELS.includes(model)) {
       this.messages.push(system(systemMsg));
     }
+    this.messages.push(...msgs);
     this.client = new OpenAI({ apiKey });
   }
 
@@ -37,7 +43,7 @@ export class OpenAiChat {
 
       // notify listeners
       this.listeners.forEach((l) => l(msg));
-      this.finishListeners.forEach((l) => l());
+      this.finishListeners.forEach((l) => l(msg));
     } else {
       const stream = await this.client.chat.completions.create({
         model: this.model,
@@ -61,8 +67,14 @@ export class OpenAiChat {
       this.messages.push(assistant(msg));
 
       // notify listeners
-      this.finishListeners.forEach((l) => l());
+      this.finishListeners.forEach((l) => l(msg));
     }
+  }
+
+  async destroy() {
+    this.messages = [];
+    this.listeners = [];
+    this.finishListeners = [];
   }
 
   // listeners
@@ -71,7 +83,7 @@ export class OpenAiChat {
     this.listeners.push(listener);
   }
 
-  onReplyFinish(l: () => void) {
+  onReplyFinish(l: (finishedMessage: string) => void) {
     this.finishListeners.push(l);
   }
 

@@ -10,12 +10,18 @@ export class AnthropicChat {
   private system: string;
 
   private listeners: ((msg: string) => void)[] = [];
-  private finishListeners: (() => void)[] = [];
+  private finishListeners: ((finishedMessage: string) => void)[] = [];
   private errorListeners: ((err: string) => void)[] = [];
 
-  constructor(apiKey: string, model: string, systemMsg: string) {
+  constructor(
+    apiKey: string,
+    model: string,
+    systemMsg: string,
+    msgs: { role: "assistant" | "user"; content: string }[] = []
+  ) {
     this.model = model;
     this.system = systemMsg;
+    this.messages.push(...msgs);
 
     this.client = new Anthropic({
       apiKey,
@@ -42,12 +48,19 @@ export class AnthropicChat {
       })
       .on("end", () => {
         // notify listeners
-        this.finishListeners.forEach((l) => l());
+        this.finishListeners.forEach((l) => l(msg));
         this.messages.push(assistant(msg));
       })
       .on("error", (err) => {
         this.errorListeners.forEach((l) => l(err.message));
       });
+  }
+
+  async destroy() {
+    this.messages = [];
+    this.listeners = [];
+    this.finishListeners = [];
+    this.errorListeners = [];
   }
 
   // listeners
@@ -56,7 +69,7 @@ export class AnthropicChat {
     this.listeners.push(listener);
   }
 
-  onReplyFinish(l: () => void) {
+  onReplyFinish(l: (finishedMessage: string) => void) {
     this.finishListeners.push(l);
   }
 

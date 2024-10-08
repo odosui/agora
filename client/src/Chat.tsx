@@ -2,9 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import { WsOutputMessage } from "../../shared/types";
 import { useWs } from "./useWs";
+import api from "./api";
+import { MessageDto } from "../../server/src/db/models/messages";
 
 type Message = {
-  from: "user" | "assistant";
+  role: "user" | "assistant";
   content: string;
   image?: {
     data: string;
@@ -44,7 +46,7 @@ const Chat: React.FC<{
     setWaitingTillReplyFinish(true);
     setMessages((prev) => {
       const newMessage: Message = {
-        from: "user",
+        role: "user",
         content: message,
       };
 
@@ -66,18 +68,18 @@ const Chat: React.FC<{
         if (msg.payload.chatId !== id) return;
         setMessages((prev) => {
           const lastMsg = prev[prev.length - 1];
-          if (lastMsg?.from === "assistant") {
+          if (lastMsg?.role === "assistant") {
             return [
               ...prev.slice(0, prev.length - 1),
               {
-                from: "assistant",
+                role: "assistant",
                 content: lastMsg.content + msg.payload.content,
               },
             ];
           } else {
             return [
               ...prev,
-              { from: "assistant", content: msg.payload.content },
+              { role: "assistant", content: msg.payload.content },
             ];
           }
         });
@@ -123,6 +125,19 @@ const Chat: React.FC<{
     }
   }, [lastMessage, handleWsMessage]);
 
+  useEffect(() => {
+    async function loadMessages() {
+      const msgs = await api.get<MessageDto[]>(`/chats/${id}/messages`);
+      setMessages(
+        msgs.map((m) => ({
+          role: m.kind === "user" ? "user" : "assistant",
+          content: m.body,
+        }))
+      );
+    }
+    loadMessages();
+  }, []);
+
   return (
     <div className="chat">
       <div className="chat-title">{name}</div>
@@ -141,9 +156,9 @@ const Chat: React.FC<{
 
       <div className="messages" ref={messagesRef}>
         {messages.map((m, i) => (
-          <div key={i} className={`message ${m.from}`}>
+          <div key={i} className={`message ${m.role}`}>
             <div className="from">
-              {m.from} {m.from === "assistant" ? "🤖" : ""}
+              {m.role} {m.role === "assistant" ? "🤖" : ""}
             </div>
             <div className="content">
               <Markdown>{m.content}</Markdown>

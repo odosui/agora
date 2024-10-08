@@ -4,11 +4,13 @@ import ws from "ws";
 // The "payload" field can be anything
 type WsstMessage = { type: string; payload: unknown };
 
-// I is the type of the input message
 // O is the type of the output message
-export function startWsServer<I extends WsstMessage>(
-  options: ws.ServerOptions
-) {
+export function startWsServer<
+  // I is the type of the input message
+  I extends WsstMessage,
+  // S is the type of the storage object
+  S extends Record<string, unknown>
+>(options: ws.ServerOptions) {
   const wsServer = new ws.Server(options);
 
   type MessageType = I["type"];
@@ -16,7 +18,7 @@ export function startWsServer<I extends WsstMessage>(
 
   type Handler<T extends MessageType> = (
     payload: Payload<T>,
-    context: { sendMsg: (message: WsstMessage) => void }
+    context: { sendMsg: (message: WsstMessage) => void; storage: Partial<S> }
   ) => Promise<void>;
 
   type Handlers = {
@@ -31,6 +33,8 @@ export function startWsServer<I extends WsstMessage>(
   }
 
   wsServer.on("connection", (wsSess) => {
+    const storage: Partial<S> = {};
+
     wsSess.on("message", async (m) => {
       const messageStr = asString(m);
 
@@ -45,6 +49,7 @@ export function startWsServer<I extends WsstMessage>(
         sendMsg: (message: WsstMessage) => {
           wsSess.send(JSON.stringify(message));
         },
+        storage,
       };
 
       await handler(data.payload, apiForHandler);
