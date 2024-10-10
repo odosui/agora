@@ -107,8 +107,13 @@ export async function runWS(server: Server) {
 
       storage.chats[payload.chatId].chat.destroy();
       delete storage.chats[payload.chatId];
-      Chats.deleteBy("uuid", payload.chatId);
-      return;
+
+      const chat = await Chats.oneBy("uuid", payload.chatId);
+      if (!chat) {
+        return;
+      }
+      await Messages.deleteBy("chat_id", chat.id);
+      await Chats.deleteBy("uuid", payload.chatId);
     });
 
   // TODO: how to handle this?
