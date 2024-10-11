@@ -286,77 +286,21 @@ li p {
   font-weight: 500;
 }
 
-.chat {
-  margin-top: var(--u3);
-  margin-bottom: var(--u3);
-  border-radius: var(--u1);
-  width: var(--u13);
-  min-width: var(--u13);
-  flex-basis: var(--u13);
-  flex: 0 0 auto;
-  background-color: #fff;
+.chat-starter {
+  background: white;
+  padding: var(--u3) var(--u5);
+  border-radius: 16px;
   border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  position: relative;
-
-  .chat-title {
-    position: absolute;
-    top: var(--u2);
-    background-color: var(--color-main);
-    color: white;
-    padding: var(--u0) var(--u1);
-    display: inline-block;
-    right: 0;
-    border-top-left-radius: var(--u1);
-    border-bottom-left-radius: var(--u1);
-    border-bottom: 1px solid var(--color-border);
-    border-top: 1px solid var(--color-border);
-    border-left: 1px solid var(--color-border);
-    font-size: 0.8em;
-  }
-
-  button.closeChat {
-    position: absolute;
-    top: var(--u6);
-    right: var(--u2);
-    background-color: var(--color-bg);
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--u5);
-    height: var(--u5);
-    border-radius: 50%;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.25s ease-in-out, background-color 0.25s;
-    padding: 0;
-    color: var(--color-text-light);
-    &:hover {
-      background-color: var(--color-bg-alt);
-      color: var(--color-text);
-    }
-  }
-
-  &:hover {
-    button.closeChat {
-      opacity: 1;
-    }
-  }
-}
-
-.chat-starter {
-  background: white;
-  padding: var(--u3);
-  margin: var(--u4);
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
   justify-content: center;
-  margin-top: auto;
-  margin-bottom: auto;
   flex: 0 0 auto;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.1);
 
   ul {
     padding: 0;
@@ -450,6 +394,131 @@ li p {
       border: 1px solid var(--color-border);
       font-size: 1em;
       flex: 1;
+    }
+  }
+}
+
+.db-menu {
+  position: fixed;
+  top: var(--u3);
+  right: var(--u3);
+
+  button {
+    background-color: var(--color-main);
+    color: white;
+    border: none;
+    display: flex;
+    font-size: 1.6em;
+    line-height: 1em;
+    align-items: center;
+    justify-content: center;
+    width: var(--u5);
+    height: var(--u5);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background-color 0.25s;
+    &:hover {
+      background-color: var(--color-main-intense);
+    }
+    &:disabled {
+      background-color: var(--color-main-bleak);
+      cursor: not-allowed;
+    }
+  }
+}
+
+.chat-wrapper {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--u1);
+  background-color: #fff;
+  border: 1px solid var(--color-border);
+
+  .top-menu {
+    height: var(--u5);
+    padding: 0 var(--u3);
+    background-color: var(--color-main);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .left {
+      display: flex;
+      gap: var(--u2);
+
+      .profile-name {
+        color: white;
+        font-weight: 500;
+        font-size: 0.8em;
+      }
+    }
+
+    .right {
+      display: flex;
+      gap: var(--u2);
+      align-items: center;
+
+      button.closeChat {
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: var(--u3);
+        height: var(--u3);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: opacity 0.25s ease-in-out, background-color 0.25s;
+        padding: 0;
+        color: white;
+        background-color: var(--color-main);
+      }
+
+      .drag-handle {
+        cursor: grab;
+        color: white;
+      }
+    }
+  }
+
+  .body {
+    flex: 1;
+    overflow-y: hidden;
+
+    .chat {
+      // margin-top: var(--u3);
+      // margin-bottom: var(--u3);
+      width: 100%;
+      height: 100%;
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+
+      .chat-title {
+        position: absolute;
+        top: var(--u2);
+        background-color: var(--color-main);
+        color: white;
+        padding: var(--u0) var(--u1);
+        display: inline-block;
+        right: 0;
+        border-top-left-radius: var(--u1);
+        border-bottom-left-radius: var(--u1);
+        border-bottom: 1px solid var(--color-border);
+        border-top: 1px solid var(--color-border);
+        border-left: 1px solid var(--color-border);
+        font-size: 0.8em;
+      }
+
+      &:hover {
+        button.closeChat {
+          opacity: 1;
+        }
+      }
     }
   }
 }
