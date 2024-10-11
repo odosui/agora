@@ -1,17 +1,28 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Profile } from "../types";
 import { useWs } from "../useWs";
+import api from "../api";
 
 const ChatStarter: React.FC<{
-  profiles: Profile[];
   dbUuid: string;
   onStarted: () => void;
-}> = ({ profiles, dbUuid, onStarted }) => {
+}> = ({ dbUuid, onStarted }) => {
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+
   const { startChat } = useWs();
 
   const handleStartChat = useCallback((name: string) => {
     startChat(name, dbUuid);
     onStarted();
+  }, []);
+
+  useEffect(() => {
+    async function fetchProfiles() {
+      const data = await api.get<Profile[]>("/profiles");
+      setProfiles(data);
+    }
+
+    fetchProfiles();
   }, []);
 
   const groupped = profiles.reduce((acc, profile) => {

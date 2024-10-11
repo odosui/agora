@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import "react-grid-layout/css/styles.css";
 import "./index.scss";
 import DashboardPage from "./pages/DashboardPage";
 import HomePage from "./pages/HomePage";

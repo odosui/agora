@@ -437,6 +437,7 @@ li p {
   border-radius: var(--u1);
   background-color: #fff;
   border: 1px solid var(--color-border);
+  overflow: hidden;
 
   .top-menu {
     height: var(--u5);
@@ -521,4 +522,17 @@ li p {
       }
     }
   }
+}
+
+.react-grid-item.react-grid-placeholder {
+  background: linear-gradient(
+      90deg,
+      rgba(0, 123, 255, 0.3) 1px,
+      transparent 1px
+    ),
+    linear-gradient(rgba(0, 123, 255, 0.3) 1px, transparent 1px);
+  background-size: 5px 5px; /* Even smaller 'net' size */
+  border: 2px dashed rgba(0, 123, 255, 0.8); /* Blue dashed border */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 0 15px rgba(0, 123, 255, 0.6); /* Stronger blue glow */
 }

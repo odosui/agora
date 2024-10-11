@@ -1,17 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import GridLayout from "react-grid-layout";
-import "react-grid-layout/css/styles.css";
 import { useParams } from "react-router-dom";
 import { ChatDto } from "../../../server/src/db/models/chats";
 import { WsOutputMessage } from "../../../shared/types";
 import Chat from "../Chat";
 import api from "../api";
 import ChatStarter from "../components/ChatStarter";
-import { Profile } from "../types";
 import { useWs } from "../useWs";
 
 function DashboardPage() {
-  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [chats, setChats] = useState<ChatDto[]>([]);
   const params = useParams<{ id: string }>();
   const { lastMessage, deleteChat } = useWs();
@@ -46,15 +43,6 @@ function DashboardPage() {
       handleWsMessage(msg);
     }
   }, [lastMessage, handleWsMessage]);
-
-  useEffect(() => {
-    async function fetchProfiles() {
-      const data = await api.get<Profile[]>("/profiles");
-      setProfiles(data);
-    }
-
-    fetchProfiles();
-  }, []);
 
   useEffect(() => {
     if (!params.id) {
@@ -126,21 +114,16 @@ function DashboardPage() {
           </div>
         ))}
       </GridLayout>
-      {profiles && (
-        <>
-          <div className="db-menu">
-            <button onClick={() => setShowChatStarter((prev) => !prev)}>
-              {showChatStarter ? "x" : "+"}
-            </button>
-          </div>
-          {showChatStarter && (
-            <ChatStarter
-              profiles={profiles}
-              dbUuid={params.id}
-              onStarted={() => setShowChatStarter(false)}
-            />
-          )}
-        </>
+      <div className="db-menu">
+        <button onClick={() => setShowChatStarter((prev) => !prev)}>
+          {showChatStarter ? "x" : "+"}
+        </button>
+      </div>
+      {showChatStarter && (
+        <ChatStarter
+          dbUuid={params.id}
+          onStarted={() => setShowChatStarter(false)}
+        />
       )}
     </main>
   );
