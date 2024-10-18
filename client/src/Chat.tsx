@@ -4,6 +4,7 @@ import { WsOutputMessage } from "../../shared/types";
 import { useWs } from "./useWs";
 import api from "./api";
 import { MessageDto } from "../../server/src/db/models/messages";
+import TextareaAutosize from "react-textarea-autosize";
 
 type Message = {
   role: "user" | "assistant";
@@ -168,9 +169,9 @@ const Chat: React.FC<{
               @
             </a>
           </div>
-          <textarea
+          <TextareaAutosize
             onKeyDown={(e) => {
-              // submit on CMD+Enter
+              // Submit on CMD+Enter
               if (e.key === "Enter" && e.metaKey) {
                 e.preventDefault();
                 handleSendMessage(e);
@@ -178,9 +179,12 @@ const Chat: React.FC<{
             }}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            ref={taRef}
+            minRows={5}
+            maxRows={30} // Adjust as needed
+            className="auto-resize-textarea"
             autoFocus
-          ></textarea>
+          />
+
           <button
             type="submit"
             onClick={handleSendMessage}

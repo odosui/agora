@@ -14,6 +14,7 @@
     "react-grid-layout": "^1.5.0",
     "react-markdown": "^9.0.1",
     "react-router-dom": "^6.26.2",
+    "react-textarea-autosize": "^8.5.4",
     "react-use-websocket": "^4.8.1",
     "sass": "^1.79.4"
   },

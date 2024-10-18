@@ -188,7 +188,10 @@ main.app {
     text-transform: uppercase;
     margin-left: var(--u2);
     height: 100%;
-    width: var(--u8);
+    width: var(--u6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   button:hover {

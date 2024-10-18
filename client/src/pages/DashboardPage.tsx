@@ -36,6 +36,12 @@ function DashboardPage() {
     },
     [deleteChat]
   );
+  // Add a state to track dragging
+  const [isDragging, setDragging] = useState(false);
+
+  // Handle drag events in your component
+  const onDragStart = () => setDragging(true);
+  const onDragStop = () => setDragging(false);
 
   useEffect(() => {
     if (lastMessage !== null) {
@@ -87,9 +93,15 @@ function DashboardPage() {
           console.log("onLayoutChange", data);
         }}
         draggableHandle=".drag-handle"
+        onDragStart={onDragStart}
+        onDragStop={onDragStop}
       >
         {chats.map((chat) => (
-          <div key={chat.uuid} className="chat-wrapper">
+          <div
+            key={chat.uuid}
+            className="chat-wrapper"
+            style={{ userSelect: isDragging ? "none" : "auto" }}
+          >
             <div className="top-menu">
               <div className="left">
                 <div className="profile-name">{chat.profileName}</div>
