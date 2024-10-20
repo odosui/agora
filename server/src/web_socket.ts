@@ -9,6 +9,9 @@ import msgs from "./msgs";
 import { log } from "./utils";
 import { AnthropicChat } from "./vendors/anthropic";
 import { OpenAiChat } from "./vendors/openai";
+import Widgets, { widgetDto } from "./db/models/widgets";
+import WidgetRuns from "./db/models/widget_runs";
+import { runTemplate } from "./tasks/templates";
 
 type ChatRecord = {
   profile: string;
@@ -16,7 +19,7 @@ type ChatRecord = {
   chat: OpenAiChat | AnthropicChat;
 };
 
-const DEFAULT_SYSTEM =
+export const DEFAULT_SYSTEM =
   "You are a helpful assistant. You answer concisely and to the point.";
 
 export async function runWS(server: Server) {
@@ -114,6 +117,54 @@ export async function runWS(server: Server) {
       }
       await Messages.deleteBy("chat_id", chat.id);
       await Chats.deleteBy("uuid", payload.chatId);
+    })
+    .on("RUN_WIDGET", async (payload, { sendMsg }) => {
+      const uuid = payload.uuid;
+
+      let widget = null;
+
+      try {
+        widget = await Widgets.oneBy("uuid", uuid);
+      } catch (error) {
+        log("Error: Widget not found", { uuid });
+        sendMsg(msgs.generalError("Widget not found"));
+        return;
+      }
+
+      if (!widget) {
+        log("Error: Widget not found", { uuid });
+        sendMsg(msgs.generalError("Widget not found"));
+        return;
+      }
+
+      const input = widget.input
+        .split("\n")
+        .filter((l) => l.trim() !== "")
+        .map((l) => l.trim());
+
+      const run = await WidgetRuns.create({
+        widget_id: widget.id,
+        input: widget.input,
+        status: "running",
+        output: "",
+      });
+      sendMsg(msgs.widgetUpdated(widgetDto(widget, run)));
+
+      try {
+        const result = await runTemplate(widget.template_name, input);
+        const wr = await WidgetRuns.update(run.id, {
+          status: "finished",
+          output: result,
+        });
+        sendMsg(msgs.widgetUpdated(widgetDto(widget, wr)));
+      } catch (error) {
+        const wr = await WidgetRuns.update(run.id, {
+          status: "error",
+          error: String(error),
+        });
+        console.error(error);
+        sendMsg(msgs.widgetUpdated(widgetDto(widget, wr)));
+      }
     });
 
   // TODO: how to handle this?

@@ -1,4 +1,5 @@
 import { ChatDto } from "../server/src/db/models/chats";
+import { WidgetDto } from "../server/src/db/models/widgets";
 
 export type WsInputMessage =
   | {
@@ -23,6 +24,12 @@ export type WsInputMessage =
       type: "DELETE_CHAT";
       payload: {
         chatId: string;
+      };
+    }
+  | {
+      type: "RUN_WIDGET";
+      payload: {
+        uuid: string;
       };
     };
 
@@ -55,5 +62,11 @@ export type WsOutputMessage =
       type: "GENERAL_ERROR";
       payload: {
         error: string;
+      };
+    }
+  | {
+      type: "WIDGET_UPDATED";
+      payload: {
+        widget: WidgetDto;
       };
     };

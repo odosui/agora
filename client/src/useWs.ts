@@ -51,11 +51,23 @@ export function useWs() {
     sendJsonMessage(e);
   };
 
+  const runWidget = (uuid: string) => {
+    const e: WsInputMessage = {
+      type: "RUN_WIDGET",
+      payload: {
+        uuid,
+      },
+    };
+
+    sendJsonMessage(e);
+  };
+
   return {
     postMessage,
     startChat,
     lastMessage,
     readyState,
     deleteChat,
+    runWidget,
   };
 }

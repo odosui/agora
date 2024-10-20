@@ -4,6 +4,7 @@
 
 import { WsOutputMessage } from "../../shared/types";
 import { ChatDto } from "./db/models/chats";
+import { WidgetDto } from "./db/models/widgets";
 
 function partialReply(id: string, content: string): WsOutputMessage {
   return {
@@ -50,12 +51,22 @@ function chatStarted(chat: ChatDto): WsOutputMessage {
   };
 }
 
+function widgetUpdated(w: WidgetDto): WsOutputMessage {
+  return {
+    type: "WIDGET_UPDATED",
+    payload: {
+      widget: w,
+    },
+  };
+}
+
 const msgs = {
   partialReply,
   replyFinish,
   generalError,
   chatError,
   chatStarted,
+  widgetUpdated,
 };
 
 export default msgs;

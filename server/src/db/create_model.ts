@@ -18,9 +18,27 @@ export function createModel<T extends QueryResultRow>(
 
     const namesStr = names.join(", ");
 
+    const params = names.map((_, i) => `$${i + 1}`).join(", ");
+
     const res = await queryAndLog<T>(
-      `INSERT INTO ${tableName} (${namesStr}) VALUES ($1, $2, $3) RETURNING ${fieldsStr}`,
+      `INSERT INTO ${tableName} (${namesStr}) VALUES (${params}) RETURNING ${fieldsStr}`,
       values
+    );
+    return res.rows[0];
+  }
+
+  async function update(id: number, o: Partial<T>) {
+    const names = Object.keys(o) as (keyof T)[];
+    const values = names.map((n) => o[n]);
+
+    const namesStr = names.join(", ");
+    const params = names.map((_, i) => `$${i + 1}`).join(", ");
+
+    const res = await queryAndLog<T>(
+      `UPDATE ${tableName} SET (${namesStr}) = (${params}) WHERE id = $${
+        names.length + 1
+      } RETURNING ${fieldsStr}`,
+      [...values, id]
     );
     return res.rows[0];
   }
@@ -77,6 +95,7 @@ export function createModel<T extends QueryResultRow>(
 
   return {
     create,
+    update,
     oneBy,
     allBy,
     all,

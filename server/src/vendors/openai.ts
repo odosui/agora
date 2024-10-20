@@ -21,7 +21,7 @@ export class OpenAiChat {
     msgs: { role: "assistant" | "user"; content: string }[] = []
   ) {
     this.model = model;
-    if (!STREAMING_NOT_SUPPORTED_MODELS.includes(model)) {
+    if (systemMsg && !STREAMING_NOT_SUPPORTED_MODELS.includes(model)) {
       this.messages.push(system(systemMsg));
     }
     this.messages.push(...msgs);
@@ -89,6 +89,17 @@ export class OpenAiChat {
 
   onError(l: (err: string) => void) {
     // TODO: implement error handling
+  }
+
+  // for plugins
+  async oneTimeRun(input: string) {
+    const result = await this.client.chat.completions.create({
+      model: this.model,
+      messages: [user(input)],
+    });
+
+    const msg = result.choices[0]?.message?.content || "";
+    return msg;
   }
 }
 

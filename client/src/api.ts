@@ -3,7 +3,7 @@ const api = {
   post,
   // put,
   // del,
-  // patch,
+  patch,
   // multipart,
 };
 
@@ -55,9 +55,9 @@ function post<T>(url: string, payload?: object) {
 //   return apic<T>("PUT", url, payload);
 // }
 
-// function patch<T>(url: string, payload?: object) {
-//   return apic<T>("PATCH", url, payload);
-// }
+function patch<T>(url: string, payload?: object) {
+  return apic<T>("PATCH", url, payload);
+}
 
 // function del<T>(url: string) {
 //   return apic<T>("DELETE", url);

@@ -76,6 +76,12 @@ export class AnthropicChat {
   onError(l: (err: string) => void) {
     this.errorListeners.push(l);
   }
+
+  // for plugins
+  async oneTimeRun(input: string) {
+    // implement me
+    return "";
+  }
 }
 
 // helpers

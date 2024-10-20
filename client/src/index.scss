@@ -1,3 +1,9 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -107,11 +113,6 @@ main.app {
   bottom: 0;
 }
 
-.app.no-chats {
-  justify-content: center;
-  align-items: center;
-}
-
 .app .chat .messages {
   flex: 1;
   overflow-y: auto;
@@ -148,7 +149,7 @@ main.app {
 
 .message-form {
   margin-top: var(--u3);
-  height: var(--u8);
+  min-height: var(--u8);
   padding: var(--u3) var(--u2);
   border-top: 1px solid var(--color-border);
   // border-radius: var(--u1);
@@ -422,7 +423,7 @@ li p {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0;
+    padding: var(--u0);
     transition: background-color 0.25s;
     &:hover {
       background-color: var(--color-main-intense);
@@ -466,21 +467,6 @@ li p {
       gap: var(--u2);
       align-items: center;
 
-      button.closeChat {
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: var(--u3);
-        height: var(--u3);
-        border-radius: 50%;
-        cursor: pointer;
-        transition: opacity 0.25s ease-in-out, background-color 0.25s;
-        padding: 0;
-        color: white;
-        background-color: var(--color-main);
-      }
-
       .drag-handle {
         cursor: grab;
         color: white;
@@ -517,12 +503,21 @@ li p {
         border-left: 1px solid var(--color-border);
         font-size: 0.8em;
       }
+    }
 
-      &:hover {
-        button.closeChat {
-          opacity: 1;
-        }
-      }
+    .widget {
+      padding: var(--u3);
+      overflow-y: auto;
+      height: 100%;
+    }
+
+    .running {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin-top: var(--u3);
     }
   }
 }
@@ -538,4 +533,94 @@ li p {
   border: 2px dashed rgba(0, 123, 255, 0.8); /* Blue dashed border */
   border-radius: 8px; /* Rounded corners */
   box-shadow: 0 0 15px rgba(0, 123, 255, 0.6); /* Stronger blue glow */
+}
+
+button.icon-button {
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--u3);
+  height: var(--u3);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.25s;
+  padding: 0;
+  color: white;
+  background-color: var(--color-main);
+
+  &:hover {
+    background-color: var(--color-main-intense);
+  }
+}
+
+.widget {
+  ol {
+    margin: var(--u4) 0;
+    padding-left: var(--u4);
+    li {
+      margin-bottom: var(--u2);
+      position: relative;
+      padding-left: var(--u1);
+    }
+  }
+}
+
+.widget-form {
+  padding: var(--u3);
+
+  form {
+    width: 100%;
+  }
+
+  .form-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--u0);
+    margin-bottom: var(--u4);
+  }
+
+  input {
+    padding: var(--u2);
+    border-radius: var(--u0);
+    border: 1px solid var(--color-border);
+    font-size: 1em;
+    flex: 1;
+    width: 100%;
+  }
+
+  textarea {
+    font-size: 1em;
+    padding: var(--u2);
+    border-radius: var(--u0);
+    border: 1px solid var(--color-border);
+    width: 100%;
+    height: var(--u11);
+  }
+}
+
+.loader {
+  width: var(--u4);
+  --b: var(--u0);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #514b82;
+  -webkit-mask: repeating-conic-gradient(
+      #0000 0deg,
+      #000 1deg 70deg,
+      #0000 71deg 90deg
+    ),
+    radial-gradient(
+      farthest-side,
+      #0000 calc(100% - var(--b) - 1px),
+      #000 calc(100% - var(--b))
+    );
+  -webkit-mask-composite: destination-in;
+  mask-composite: intersect;
+  animation: l5 1s infinite;
+}
+@keyframes l5 {
+  to {
+    transform: rotate(0.5turn);
+  }
 }

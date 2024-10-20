@@ -3,6 +3,8 @@ import ConfigFile from "./config_file";
 import Chats, { Chat, chatDto } from "./db/models/chats";
 import Dashboards, { Dashboard, dbToDto } from "./db/models/dashboards";
 import Messages, { messageDto } from "./db/models/messages";
+import WidgetRuns, { lastRunOfWidget } from "./db/models/widget_runs";
+import Widgets, { widgetDto } from "./db/models/widgets";
 
 const PORT = process.env.PORT || 3000;
 
@@ -17,6 +19,7 @@ export async function runRest() {
   app.use((_req, res, next) => {
     res.header("Access-Control-Allow-Origin", "http://localhost:5173");
     res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE");
     next();
   });
 
@@ -111,6 +114,35 @@ export async function runRest() {
     res.json(chats.map(chatDto));
   });
 
+  app.get("/api/dashboards/:id/widgets", async (req, res) => {
+    const id = req.params.id;
+
+    let db: Dashboard | null = null;
+
+    try {
+      db = await Dashboards.oneBy("uuid", id);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
+
+    if (!db) {
+      res.status(404).json({ error: "Dashboard not found" });
+      return;
+    }
+
+    const widgets = await Widgets.allBy("dashboard_id", db.id);
+
+    const o = [];
+    for (const widget of widgets) {
+      const lastRun = await lastRunOfWidget(widget.id);
+      o.push(widgetDto(widget, lastRun));
+    }
+
+    res.json(o);
+  });
+
   app.get("/api/chats/:id/messages", async (req, res) => {
     const id = req.params.id;
 
@@ -135,6 +167,42 @@ export async function runRest() {
     ]);
 
     res.json(messages.map(messageDto));
+  });
+
+  app.patch("/api/widgets/:id", async (req, res) => {
+    const uuid = req.params.id;
+
+    let widget = null;
+
+    try {
+      widget = await Widgets.oneBy("uuid", uuid);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
+
+    if (!widget) {
+      res.status(404).json({ error: "Widget not found" });
+      return;
+    }
+
+    const { name, input } = req.body;
+
+    if (!name) {
+      res.status(400).json({ error: "Name and input are required" });
+      return;
+    }
+
+    try {
+      const w = await Widgets.update(widget.id, { name, input });
+      const lastRun = await lastRunOfWidget(w.id);
+      res.json(widgetDto(w, lastRun));
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
   });
 
   const server = app.listen(PORT, () => {

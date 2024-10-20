@@ -2,17 +2,20 @@ import { useCallback, useEffect, useState } from "react";
 import GridLayout from "react-grid-layout";
 import { useParams } from "react-router-dom";
 import { ChatDto } from "../../../server/src/db/models/chats";
+import { WidgetDto } from "../../../server/src/db/models/widgets";
 import { WsOutputMessage } from "../../../shared/types";
 import Chat from "../Chat";
+import Widget from "../Widget";
 import api from "../api";
 import ChatStarter from "../components/ChatStarter";
 import { useWs } from "../useWs";
 
 function DashboardPage() {
-  const [chats, setChats] = useState<ChatDto[]>([]);
-  const params = useParams<{ id: string }>();
   const { lastMessage, deleteChat } = useWs();
+  const params = useParams<{ id: string }>();
 
+  const [chats, setChats] = useState<ChatDto[]>([]);
+  const [widgets, setWidgets] = useState<WidgetDto[]>([]);
   const [showChatStarter, setShowChatStarter] = useState(false);
 
   const handleWsMessage = useCallback((msg: WsOutputMessage) => {
@@ -60,8 +63,11 @@ function DashboardPage() {
       const chts = await api.get<ChatDto[]>(`/dashboards/${params.id}/chats`);
       setChats(chts);
 
-      if (chts.length === 0) {
-        console.log("No chats, showing chat starter");
+      const ws = await api.get<WidgetDto[]>(`/dashboards/${params.id}/widgets`);
+      setWidgets(ws);
+
+      if (chts.length === 0 && ws.length === 0) {
+        console.log("Empty board, showing chat starter");
         setShowChatStarter(true);
       }
     }
@@ -80,6 +86,16 @@ function DashboardPage() {
     w: 4,
     h: 16,
   }));
+
+  widgets.forEach((widget, i) => {
+    layout.push({
+      i: widget.uuid,
+      x: i * 4,
+      y: i * 2,
+      w: 4,
+      h: 16,
+    });
+  });
 
   return (
     <main className={`app ${chats.length === 0 ? "no-chats" : ""}`}>
@@ -107,16 +123,7 @@ function DashboardPage() {
                 <div className="profile-name">{chat.profileName}</div>
               </div>
               <div className="right">
-                <button
-                  className="closeChat"
-                  title="Delete chat"
-                  aria-label="Delete chat"
-                  aria-hidden="true"
-                  onClick={() => handleDeleteChat(chat.uuid)}
-                >
-                  x
-                </button>
-
+                <DeleteButton onDelete={() => handleDeleteChat(chat.uuid)} />
                 <div className="drag-handle">::</div>
               </div>
             </div>
@@ -125,10 +132,49 @@ function DashboardPage() {
             </div>
           </div>
         ))}
+        {widgets.map((w) => (
+          <div
+            key={w.uuid}
+            className="chat-wrapper"
+            style={{ userSelect: isDragging ? "none" : "auto" }}
+          >
+            <Widget widget={w} onDelete={() => handleDeleteChat(w.uuid)} />
+          </div>
+        ))}
       </GridLayout>
       <div className="db-menu">
         <button onClick={() => setShowChatStarter((prev) => !prev)}>
-          {showChatStarter ? "x" : "+"}
+          {showChatStarter ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18 18 6M6 6l12 12"
+              />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="size-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15"
+              />
+            </svg>
+          )}
         </button>
       </div>
       {showChatStarter && (
@@ -142,3 +188,32 @@ function DashboardPage() {
 }
 
 export default DashboardPage;
+
+const DeleteButton: React.FC<{
+  onDelete: () => void;
+}> = ({ onDelete }) => {
+  return (
+    <button
+      className="closeChat"
+      title="Delete chat"
+      aria-label="Delete chat"
+      aria-hidden="true"
+      onClick={onDelete}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="size-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M6 18 18 6M6 6l12 12"
+        />
+      </svg>
+    </button>
+  );
+};
