@@ -556,13 +556,32 @@ button.icon-button {
 
 .widget {
   ol {
-    margin: var(--u4) 0;
+    margin: 0 0 var(--u4) 0;
     padding-left: var(--u4);
     li {
       margin-bottom: var(--u2);
       position: relative;
       padding-left: var(--u1);
     }
+  }
+
+  p {
+    margin: 0 0 var(--u4) 0;
+  }
+
+  h1 {
+    font-size: 2em;
+    margin-bottom: var(--u2);
+  }
+
+  h2 {
+    font-size: 1.6em;
+    margin-bottom: var(--u2);
+  }
+
+  h3 {
+    font-size: 1.4em;
+    margin-bottom: var(--u2);
   }
 }
 
@@ -596,6 +615,15 @@ button.icon-button {
     border: 1px solid var(--color-border);
     width: 100%;
     height: var(--u11);
+  }
+
+  select {
+    padding: var(--u2);
+    border-radius: var(--u0);
+    border: 1px solid var(--color-border);
+    font-size: 1em;
+    flex: 1;
+    width: 100%;
   }
 }
 

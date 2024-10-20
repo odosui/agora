@@ -5,6 +5,7 @@ import { useWs } from "./useWs";
 import api from "./api";
 import { MessageDto } from "../../server/src/db/models/messages";
 import TextareaAutosize from "react-textarea-autosize";
+import DeleteButton from "./components/DeleteButton";
 
 type Message = {
   role: "user" | "assistant";
@@ -17,7 +18,9 @@ type Message = {
 
 const Chat: React.FC<{
   id: string;
-}> = ({ id }) => {
+  profileName: string;
+  onDelete: () => void;
+}> = ({ id, profileName, onDelete }) => {
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [waitingTillReplyFinish, setWaitingTillReplyFinish] =
@@ -133,78 +136,91 @@ const Chat: React.FC<{
   }, []);
 
   return (
-    <div className="chat">
-      <div className="messages" ref={messagesRef}>
-        {messages.map((m, i) => (
-          <div key={i} className={`message ${m.role}`}>
-            <div className="from">
-              {m.role} {m.role === "assistant" ? "🤖" : ""}
-            </div>
-            <div className="content">
-              <Markdown>{m.content}</Markdown>
-            </div>
-            {m.image && (
-              <div className="message-image">
-                <img
-                  src={`data:${m.image.type};base64,${m.image.data}`}
-                  alt="Attached"
-                />
+    <>
+      <div className="top-menu">
+        <div className="left">
+          <div className="profile-name">{profileName}</div>
+        </div>
+        <div className="right">
+          <DeleteButton onDelete={onDelete} />
+          <div className="drag-handle">::</div>
+        </div>
+      </div>
+      <div className="body">
+        <div className="chat">
+          <div className="messages" ref={messagesRef}>
+            {messages.map((m, i) => (
+              <div key={i} className={`message ${m.role}`}>
+                <div className="from">
+                  {m.role} {m.role === "assistant" ? "🤖" : ""}
+                </div>
+                <div className="content">
+                  <Markdown>{m.content}</Markdown>
+                </div>
+                {m.image && (
+                  <div className="message-image">
+                    <img
+                      src={`data:${m.image.type};base64,${m.image.data}`}
+                      alt="Attached"
+                    />
+                  </div>
+                )}
               </div>
-            )}
+            ))}
+
+            {chatError && <div className="message error">{chatError}</div>}
           </div>
-        ))}
 
-        {chatError && <div className="message error">{chatError}</div>}
-      </div>
-
-      <div className="message-form">
-        <div className="message-form-main">
-          <div className="attach-wrapper">
-            <a
-              href="#"
-              onClick={handleAttachImage}
-              role="button"
-              title="Attach an image"
-            >
-              @
-            </a>
-          </div>
-          <TextareaAutosize
-            onKeyDown={(e) => {
-              // Submit on CMD+Enter
-              if (e.key === "Enter" && e.metaKey) {
-                e.preventDefault();
-                handleSendMessage(e);
-              }
-            }}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            minRows={5}
-            maxRows={30} // Adjust as needed
-            className="auto-resize-textarea"
-            autoFocus
-          />
-
-          <button
-            type="submit"
-            onClick={handleSendMessage}
-            disabled={!readyState || waitingTillReplyFinish || !!chatError}
-          >
-            ⌘↩
-          </button>
-        </div>
-        <div className="message-form-footer">
-          {file && (
-            <div className="attached">
-              <img
-                src={`data:${file.type};base64,${file.data}`}
-                alt="Attached"
+          <div className="message-form">
+            <div className="message-form-main">
+              <div className="attach-wrapper">
+                <a
+                  href="#"
+                  onClick={handleAttachImage}
+                  role="button"
+                  title="Attach an image"
+                >
+                  @
+                </a>
+              </div>
+              <TextareaAutosize
+                onKeyDown={(e) => {
+                  // Submit on CMD+Enter
+                  if (e.key === "Enter" && e.metaKey) {
+                    e.preventDefault();
+                    handleSendMessage(e);
+                  }
+                }}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                minRows={5}
+                maxRows={30} // Adjust as needed
+                className="auto-resize-textarea"
+                autoFocus
               />
+
+              <button
+                type="submit"
+                onClick={handleSendMessage}
+                disabled={!readyState || waitingTillReplyFinish || !!chatError}
+              >
+                ⌘↩
+              </button>
             </div>
-          )}
+            <div className="message-form-footer">
+              {file && (
+                <div className="attached">
+                  <img
+                    src={`data:${file.type};base64,${file.data}`}
+                    alt="Attached"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

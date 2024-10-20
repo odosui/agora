@@ -4,7 +4,7 @@ import { AnthropicChat } from "../vendors/anthropic";
 import { OpenAiChat } from "../vendors/openai";
 import { DEFAULT_SYSTEM } from "../web_socket";
 
-interface Template {
+export interface Template {
   id: string;
   name: string;
   description: string;
@@ -15,10 +15,17 @@ const summarizeWebsites: Template = {
   id: "summarize_websites",
   name: "Summarize Websites",
   description: "Summarize a list of websites",
-  flow: `|> url2md |> chat::GPT-4o::"Please summarize the following news websites. What are the main stories? Please provide links to full stories. Please be super-concise and only focus on what is the most important. Please use the language used in the website. So if the website is Russian, write your output in Russian. \n\n $$"`,
+  flow: `|> url2md |> chat::GPT-4o::"Please summarize the following news websites. What are the main stories (around 5-7)? Please provide links to full stories. Please be super-concise. Please prioritize the most recent stories. Please use the language used in the website. So if the website is Russian, write your output in Russian. \n\n $$"`,
 };
 
-const templates: Template[] = [summarizeWebsites];
+const topHackerNews: Template = {
+  id: "top_hacker_news",
+  name: "Top Hacker News",
+  description: "Fetch top stories from Hacker News",
+  flow: `|> url2md |> chat::GPT-4o::"What are the top stories from the hackernews? See below. Please output in markdown. Please include 10 stories, along with number of comments and voites. \n\n $$"`,
+};
+
+export const templates: Template[] = [summarizeWebsites, topHackerNews];
 
 const services: Record<
   string,

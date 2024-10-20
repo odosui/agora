@@ -10,6 +10,18 @@ import api from "../api";
 import ChatStarter from "../components/ChatStarter";
 import { useWs } from "../useWs";
 
+// hard-coded in ui
+// but positions are saved in db
+// hmmmm
+const COLS = 128;
+const COL_WIDTH = 32; // px
+const ROW_HEIGHT = 32; // px
+const GRID_WIDTH = COLS * COL_WIDTH;
+const MIN_WIDTH = 4;
+
+const DEFAULT_W = 8;
+const DEFAULT_H = 12;
+
 function DashboardPage() {
   const { lastMessage, deleteChat } = useWs();
   const params = useParams<{ id: string }>();
@@ -79,35 +91,56 @@ function DashboardPage() {
     return null;
   }
 
-  const layout: GridLayout.Layout[] = chats.map((chat, i) => ({
-    i: chat.uuid,
-    x: i * 4,
-    y: i * 2,
-    w: 4,
-    h: 16,
+  const layout: GridLayout.Layout[] = [...chats, ...widgets].map((o) => ({
+    i: o.uuid,
+    x: o.position?.x ?? 0,
+    y: o.position?.y ?? Infinity,
+    w: o.position?.w ?? DEFAULT_W,
+    h: o.position?.h ?? DEFAULT_H,
+    minW: MIN_WIDTH,
   }));
 
-  widgets.forEach((widget, i) => {
-    layout.push({
-      i: widget.uuid,
-      x: i * 4,
-      y: i * 2,
-      w: 4,
-      h: 16,
-    });
-  });
+  // TODO: track and only update
+  // the changed layout items
+  const handleLayoutChange = useCallback(
+    (lay: GridLayout.Layout[]) => {
+      lay.forEach((l) => {
+        const pos = JSON.stringify({
+          x: l.x,
+          y: l.y,
+          w: l.w,
+          h: l.h,
+        });
+
+        const chat = chats.find((c) => c.uuid === l.i);
+        if (chat) {
+          api.patch(`/chats/${chat.uuid}`, {
+            position: pos,
+          });
+        } else {
+          const widget = widgets.find((w) => w.uuid === l.i);
+          if (widget) {
+            api.patch(`/widgets/${widget.uuid}`, {
+              position: pos,
+            });
+          } else {
+            console.error("Unknown layout item:", l.i);
+          }
+        }
+      });
+    },
+    [widgets, chats]
+  );
 
   return (
     <main className={`app ${chats.length === 0 ? "no-chats" : ""}`}>
       <GridLayout
         className="layout"
         layout={layout}
-        cols={12}
-        rowHeight={30}
-        width={1200}
-        onLayoutChange={(...data) => {
-          console.log("onLayoutChange", data);
-        }}
+        cols={COLS}
+        rowHeight={ROW_HEIGHT}
+        width={GRID_WIDTH}
+        onLayoutChange={handleLayoutChange}
         draggableHandle=".drag-handle"
         onDragStart={onDragStart}
         onDragStop={onDragStop}
@@ -118,18 +151,11 @@ function DashboardPage() {
             className="chat-wrapper"
             style={{ userSelect: isDragging ? "none" : "auto" }}
           >
-            <div className="top-menu">
-              <div className="left">
-                <div className="profile-name">{chat.profileName}</div>
-              </div>
-              <div className="right">
-                <DeleteButton onDelete={() => handleDeleteChat(chat.uuid)} />
-                <div className="drag-handle">::</div>
-              </div>
-            </div>
-            <div className="body">
-              <Chat id={chat.uuid} />
-            </div>
+            <Chat
+              id={chat.uuid}
+              profileName={chat.profileName}
+              onDelete={() => handleDeleteChat(chat.uuid)}
+            />
           </div>
         ))}
         {widgets.map((w) => (
@@ -188,32 +214,3 @@ function DashboardPage() {
 }
 
 export default DashboardPage;
-
-const DeleteButton: React.FC<{
-  onDelete: () => void;
-}> = ({ onDelete }) => {
-  return (
-    <button
-      className="closeChat"
-      title="Delete chat"
-      aria-label="Delete chat"
-      aria-hidden="true"
-      onClick={onDelete}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        className="size-6"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M6 18 18 6M6 6l12 12"
-        />
-      </svg>
-    </button>
-  );
-};

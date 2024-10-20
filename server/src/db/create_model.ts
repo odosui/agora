@@ -34,6 +34,16 @@ export function createModel<T extends QueryResultRow>(
     const namesStr = names.join(", ");
     const params = names.map((_, i) => `$${i + 1}`).join(", ");
 
+    // if only one field is being updated
+    // we don't need parenthesis
+    if (names.length === 1) {
+      const res = await queryAndLog<T>(
+        `UPDATE ${tableName} SET ${namesStr} = $1 WHERE id = $2 RETURNING ${fieldsStr}`,
+        [values[0], id]
+      );
+      return res.rows[0];
+    }
+
     const res = await queryAndLog<T>(
       `UPDATE ${tableName} SET (${namesStr}) = (${params}) WHERE id = $${
         names.length + 1

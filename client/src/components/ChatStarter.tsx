@@ -1,14 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { Profile } from "../types";
 import { useWs } from "../useWs";
-import api from "../api";
 
 const ChatStarter: React.FC<{
   dbUuid: string;
   onStarted: () => void;
 }> = ({ dbUuid, onStarted }) => {
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-
   const { startChat } = useWs();
 
   const handleStartChat = useCallback((name: string) => {
@@ -16,16 +13,7 @@ const ChatStarter: React.FC<{
     onStarted();
   }, []);
 
-  useEffect(() => {
-    async function fetchProfiles() {
-      const data = await api.get<Profile[]>("/profiles");
-      setProfiles(data);
-    }
-
-    fetchProfiles();
-  }, []);
-
-  const groupped = profiles.reduce((acc, profile) => {
+  const groupped = window.agora.profiles.reduce((acc, profile) => {
     acc[profile.vendor] = acc[profile.vendor] || [];
     acc[profile.vendor].push(profile);
     return acc;

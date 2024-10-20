@@ -3,8 +3,10 @@ import ConfigFile from "./config_file";
 import Chats, { Chat, chatDto } from "./db/models/chats";
 import Dashboards, { Dashboard, dbToDto } from "./db/models/dashboards";
 import Messages, { messageDto } from "./db/models/messages";
-import WidgetRuns, { lastRunOfWidget } from "./db/models/widget_runs";
+import { lastRunOfWidget } from "./db/models/widget_runs";
 import Widgets, { widgetDto } from "./db/models/widgets";
+import { templates } from "./tasks/templates";
+import { url2md } from "./url2md";
 
 const PORT = process.env.PORT || 3000;
 
@@ -35,7 +37,10 @@ export async function runRest() {
         vendor: config?.profiles[name].vendor,
         model: config?.profiles[name].model,
       }));
-      res.json(profiles);
+      res.json({
+        profiles,
+        templates,
+      });
     } catch (error) {
       res.status(500).json({ error: "Internal server error" });
     }
@@ -187,15 +192,13 @@ export async function runRest() {
       return;
     }
 
-    const { name, input } = req.body;
+    const { name, input, position, templateName: template_name } = req.body;
 
-    if (!name) {
-      res.status(400).json({ error: "Name and input are required" });
-      return;
-    }
+    const payload = position ? { position } : { name, input, template_name };
 
     try {
-      const w = await Widgets.update(widget.id, { name, input });
+      console.log("Updating widget", widget.id, payload);
+      const w = await Widgets.update(widget.id, payload);
       const lastRun = await lastRunOfWidget(w.id);
       res.json(widgetDto(w, lastRun));
     } catch (error) {
@@ -203,6 +206,54 @@ export async function runRest() {
       res.status(500).json({ error: "Internal server error" });
       return;
     }
+  });
+
+  app.patch("/api/chats/:id", async (req, res) => {
+    const uuid = req.params.id;
+
+    let chat = null;
+
+    try {
+      chat = await Chats.oneBy("uuid", uuid);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
+
+    if (!chat) {
+      res.status(404).json({ error: "Chat not found" });
+      return;
+    }
+
+    const { position } = req.body;
+
+    const payload = { position };
+
+    try {
+      const c = await Chats.update(chat.id, payload);
+      res.json(chatDto(c));
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
+  });
+
+  app.get("/api/md", async (req, res) => {
+    const url = req.query.url;
+    if (!url) {
+      res.status(400).json({ error: "url is required" });
+      return;
+    }
+
+    const md = await url2md(String(url));
+    // download as markdown file
+
+    res.setHeader("Content-Disposition", `attachment; filename=test.md`);
+    res.setHeader("Content-Type", "text/markdown");
+
+    res.send(md);
   });
 
   const server = app.listen(PORT, () => {

@@ -8,9 +8,10 @@ const WidgetForm: React.FC<{
   templateName: string;
   uuid?: string;
   onSave: (w: WidgetDto) => void;
-}> = ({ initialName, initialInput, uuid, onSave, templateName }) => {
+}> = ({ initialName, initialInput, uuid, onSave, templateName: tn }) => {
   const [name, setName] = useState(initialName);
   const [input, setInput] = useState(initialInput);
+  const [templateName, setTemplateName] = useState(tn);
   const [isDirty, setIsDirty] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -24,13 +25,24 @@ const WidgetForm: React.FC<{
     setIsDirty(true);
   };
 
+  const handleTemplateNameChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setTemplateName(e.target.value);
+    setIsDirty(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isDirty) return;
 
     if (uuid) {
       setSaving(true);
-      const w = await api.patch<WidgetDto>(`/widgets/${uuid}`, { name, input });
+      const w = await api.patch<WidgetDto>(`/widgets/${uuid}`, {
+        name,
+        input,
+        templateName,
+      });
       setSaving(false);
       onSave(w);
     } else {
@@ -55,7 +67,13 @@ const WidgetForm: React.FC<{
         </div>
         <div className="form-item">
           <label>Template</label>
-          <input type="text" value={templateName} disabled />
+          <select value={templateName} onChange={handleTemplateNameChange}>
+            {window.agora.templates.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.id}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="form-item">
           <label>Input</label>

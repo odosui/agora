@@ -1,4 +1,5 @@
 import { createModel } from "../create_model";
+import { parsePosition } from "./chats";
 import { WidgetRun, widgetRunDto } from "./widget_runs";
 
 export type Widget = {
@@ -7,6 +8,7 @@ export type Widget = {
   uuid: string;
   name: string;
   input: string;
+  position: string;
   template_name: string;
   created_at: Date;
   updated_at: Date;
@@ -18,6 +20,7 @@ const fields: (keyof Widget)[] = [
   "name",
   "input",
   "template_name",
+  "position",
   "created_at",
   "updated_at",
   "dashboard_id",
@@ -34,6 +37,7 @@ export function widgetDto(c: Widget, lastRun: WidgetRun | null) {
     createdAt: c.created_at.toISOString(),
     updatedAt: c.updated_at.toISOString(),
     lastRun: lastRun ? widgetRunDto(lastRun) : null,
+    position: parsePosition(c.position),
   };
 }
 
