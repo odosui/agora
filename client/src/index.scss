@@ -38,6 +38,7 @@
   --color-bg: #f1f1f1;
   --color-bg-alt: #e0e0e0;
   --color-border: #e0e0e0;
+  --color-border-light: #f0f0f0;
 
   --color-main: #646cff;
   --color-main-intense: #535bf2;
@@ -509,10 +510,11 @@ li p {
   .top-menu {
     height: var(--u5);
     padding: 0 var(--u3);
-    background-color: var(--color-main);
     display: flex;
     align-items: center;
     justify-content: space-between;
+    border-bottom: 1px solid var(--color-border-light);
+    overflow: hidden;
 
     .left {
       display: flex;
@@ -522,17 +524,34 @@ li p {
         color: white;
         font-weight: 500;
         font-size: 0.8em;
+        color: var(--color-text);
+        // background-color: var(--color-main);
+        // padding: var(--u0) var(--u2);
+        // border-radius: var(--u1);
       }
     }
 
     .right {
       display: flex;
-      gap: var(--u2);
+      gap: var(--u0);
       align-items: center;
+      justify-content: end;
 
       .drag-handle {
         cursor: grab;
-        color: white;
+        color: var(--color-text-light);
+      }
+
+      button {
+        color: var(--color-text-light);
+        background-color: white;
+        width: var(--u4);
+        height: var(--u4);
+        padding: var(--u0);
+
+        &:hover {
+          background-color: var(--color-bg-alt);
+        }
       }
     }
   }
@@ -605,7 +624,7 @@ button.icon-button {
   justify-content: center;
   width: var(--u3);
   height: var(--u3);
-  border-radius: 50%;
+  border-radius: var(--u1);
   cursor: pointer;
   transition: background-color 0.25s;
   padding: 0;

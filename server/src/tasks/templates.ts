@@ -15,7 +15,7 @@ const summarizeWebsites: Template = {
   id: "summarize_websites",
   name: "Summarize Websites",
   description: "Summarize a list of websites",
-  flow: `|> url2md |> chat::GPT-4o-mini::"Please summarize the following news websites. What are the main stories (around 5-7)? Please provide links to full stories. Please be super-concise. Please prioritize the most recent stories. Please use the language used in the website. So if the website is Russian, write your output in Russian. \n\n $$"`,
+  flow: `|> url2md |> chat::GPT-4o::"Please summarize the following news websites. What are the main stories (around 5-7)? Please provide links to full stories. Use markdown, so they are clickable. Please be concise. Prioritize the most recent stories. Please use the language used in the website. So if the website is Russian, write your output in Russian. \n\n $$"`,
 };
 
 const topHackerNews: Template = {
