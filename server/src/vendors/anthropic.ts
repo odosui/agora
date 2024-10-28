@@ -1,9 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { MessageParam } from "@anthropic-ai/sdk/resources";
+import { ChatEngine } from "./chat_engine";
 
 const MAX_TOKENS = 1024;
 
-export class AnthropicChat {
+export class AnthropicChat implements ChatEngine {
   private model: string;
   private client: Anthropic;
   private messages: MessageParam[] = [];
@@ -63,6 +64,25 @@ export class AnthropicChat {
     this.errorListeners = [];
   }
 
+  // for plugins
+  async oneTimeRun(input: string) {
+    const res = await this.client.messages.create({
+      messages: [user(input)],
+      model: this.model,
+      max_tokens: MAX_TOKENS,
+      system: this.system,
+    });
+
+    const c = res.content[0];
+
+    if (c.type === "text") {
+      return c.text;
+    }
+
+    // ??? implement me
+    return "";
+  }
+
   // listeners
 
   onPartialReply(listener: (msg: string) => void) {
@@ -75,12 +95,6 @@ export class AnthropicChat {
 
   onError(l: (err: string) => void) {
     this.errorListeners.push(l);
-  }
-
-  // for plugins
-  async oneTimeRun(input: string) {
-    // implement me
-    return "";
   }
 }
 

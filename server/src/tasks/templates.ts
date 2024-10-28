@@ -22,7 +22,7 @@ const topHackerNews: Template = {
   id: "top_hacker_news",
   name: "Top Hacker News",
   description: "Fetch top stories from Hacker News",
-  flow: `|> url2md |> chat::GPT-4o-mini::"What are the top stories from the hackernews? See below. Please output in markdown. Please include 10 stories, along with number of comments and voites. \n\n $$"`,
+  flow: `|> url2md |> chat::claude-3-5-sonnet::"What are the top stories from the hackernews? See below. Please output in markdown. Please include 10 stories, along with the link to the story, link to the comments, number of comments and number of votes. \n\n $$"`,
 };
 
 export const templates: Template[] = [summarizeWebsites, topHackerNews];

@@ -1,11 +1,15 @@
 import OpenAI from "openai";
+import { ChatEngine } from "./chat_engine";
 
 type ChatCompletionMessageParam =
   OpenAI.Chat.Completions.ChatCompletionMessageParam;
 
 const STREAMING_NOT_SUPPORTED_MODELS = ["o1-preview", "o1-mini"];
 
-export class OpenAiChat {
+const isStreamingNotSupported = (model: string) =>
+  STREAMING_NOT_SUPPORTED_MODELS.some((m) => model.startsWith(m));
+
+export class OpenAiChat implements ChatEngine {
   private model: string;
 
   private client: OpenAI;
@@ -21,7 +25,7 @@ export class OpenAiChat {
     msgs: { role: "assistant" | "user"; content: string }[] = []
   ) {
     this.model = model;
-    if (systemMsg && !STREAMING_NOT_SUPPORTED_MODELS.includes(model)) {
+    if (systemMsg && !isStreamingNotSupported(model)) {
       this.messages.push(system(systemMsg));
     }
     this.messages.push(...msgs);
@@ -32,7 +36,7 @@ export class OpenAiChat {
     this.messages.push(user(input));
 
     // models like o1-preview and o1-mini do not support streaming
-    if (STREAMING_NOT_SUPPORTED_MODELS.includes(this.model)) {
+    if (isStreamingNotSupported(this.model)) {
       const result = await this.client.chat.completions.create({
         model: this.model,
         messages: this.messages,
