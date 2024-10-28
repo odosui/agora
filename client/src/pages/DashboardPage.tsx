@@ -8,6 +8,7 @@ import Chat from "../Chat";
 import Widget from "../Widget";
 import api from "../api";
 import ChatStarter from "../components/ChatStarter";
+import NavBar from "../features/layout/NavBar";
 import { useWs } from "../useWs";
 
 // hard-coded in ui
@@ -133,83 +134,88 @@ function DashboardPage() {
   );
 
   return (
-    <main className={`app ${chats.length === 0 ? "no-chats" : ""}`}>
-      <GridLayout
-        className="layout"
-        layout={layout}
-        cols={COLS}
-        rowHeight={ROW_HEIGHT}
-        width={GRID_WIDTH}
-        onLayoutChange={handleLayoutChange}
-        draggableHandle=".drag-handle"
-        onDragStart={onDragStart}
-        onDragStop={onDragStop}
-      >
-        {chats.map((chat) => (
-          <div
-            key={chat.uuid}
-            className="chat-wrapper"
-            style={{ userSelect: isDragging ? "none" : "auto" }}
-          >
-            <Chat
-              id={chat.uuid}
-              profileName={chat.profileName}
-              onDelete={() => handleDeleteChat(chat.uuid)}
-            />
-          </div>
-        ))}
-        {widgets.map((w) => (
-          <div
-            key={w.uuid}
-            className="chat-wrapper"
-            style={{ userSelect: isDragging ? "none" : "auto" }}
-          >
-            <Widget widget={w} onDelete={() => handleDeleteChat(w.uuid)} />
-          </div>
-        ))}
-      </GridLayout>
-      <div className="db-menu">
-        <button onClick={() => setShowChatStarter((prev) => !prev)}>
-          {showChatStarter ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6"
+    <div className="layout-wrapper">
+      <aside>
+        <NavBar />
+      </aside>
+      <main className={`app ${chats.length === 0 ? "no-chats" : ""}`}>
+        <GridLayout
+          className="layout"
+          layout={layout}
+          cols={COLS}
+          rowHeight={ROW_HEIGHT}
+          width={GRID_WIDTH}
+          onLayoutChange={handleLayoutChange}
+          draggableHandle=".drag-handle"
+          onDragStart={onDragStart}
+          onDragStop={onDragStop}
+        >
+          {chats.map((chat) => (
+            <div
+              key={chat.uuid}
+              className="chat-wrapper"
+              style={{ userSelect: isDragging ? "none" : "auto" }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18 18 6M6 6l12 12"
+              <Chat
+                id={chat.uuid}
+                profileName={chat.profileName}
+                onDelete={() => handleDeleteChat(chat.uuid)}
               />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6"
+            </div>
+          ))}
+          {widgets.map((w) => (
+            <div
+              key={w.uuid}
+              className="chat-wrapper"
+              style={{ userSelect: isDragging ? "none" : "auto" }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-          )}
-        </button>
-      </div>
-      {showChatStarter && (
-        <ChatStarter
-          dbUuid={params.id}
-          onStarted={() => setShowChatStarter(false)}
-        />
-      )}
-    </main>
+              <Widget widget={w} onDelete={() => handleDeleteChat(w.uuid)} />
+            </div>
+          ))}
+        </GridLayout>
+        <div className="db-menu">
+          <button onClick={() => setShowChatStarter((prev) => !prev)}>
+            {showChatStarter ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
+                />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4.5v15m7.5-7.5h-15"
+                />
+              </svg>
+            )}
+          </button>
+        </div>
+        {showChatStarter && (
+          <ChatStarter
+            dbUuid={params.id}
+            onStarted={() => setShowChatStarter(false)}
+          />
+        )}
+      </main>
+    </div>
   );
 }
 
