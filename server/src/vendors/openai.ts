@@ -22,14 +22,17 @@ export class OpenAiChat implements ChatEngine {
     apiKey: string,
     model: string,
     systemMsg: string,
-    msgs: { role: "assistant" | "user"; content: string }[] = []
+    msgs: { role: "assistant" | "user"; content: string }[] = [],
+    baseURL?: string
   ) {
     this.model = model;
     if (systemMsg && !isStreamingNotSupported(model)) {
       this.messages.push(system(systemMsg));
     }
     this.messages.push(...msgs);
-    this.client = new OpenAI({ apiKey });
+
+    const params = baseURL ? { baseURL, apiKey } : { apiKey };
+    this.client = new OpenAI(params);
   }
 
   async postMessage(input: string, _file?: { data: string; type: string }) {

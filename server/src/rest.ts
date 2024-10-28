@@ -59,14 +59,14 @@ export async function runRest() {
 
   app.post("/api/dashboards", async (req, res) => {
     try {
-      const { name } = req.body;
+      const { name }: { name: string } = req.body;
 
       if (!name) {
         res.status(400).json({ error: "Name is required" });
         return;
       }
 
-      const db = await Dashboards.create(name);
+      const db = await Dashboards.create({ name });
       res.json(dbToDto(db));
     } catch (error) {
       console.error(error);

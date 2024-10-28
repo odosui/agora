@@ -4,19 +4,20 @@ import ConfigFile from "./config_file";
 import Chats, { chatDto } from "./db/models/chats";
 import Dashboards from "./db/models/dashboards";
 import Messages, { Message } from "./db/models/messages";
+import WidgetRuns from "./db/models/widget_runs";
+import Widgets, { widgetDto } from "./db/models/widgets";
 import { startWsServer } from "./framework/wsst";
 import msgs from "./msgs";
+import { runTemplate } from "./tasks/templates";
 import { log } from "./utils";
 import { AnthropicChat } from "./vendors/anthropic";
 import { OpenAiChat } from "./vendors/openai";
-import Widgets, { widgetDto } from "./db/models/widgets";
-import WidgetRuns from "./db/models/widget_runs";
-import { runTemplate } from "./tasks/templates";
+import { XAiChat } from "./vendors/xai";
 
 type ChatRecord = {
   profile: string;
   messages: [];
-  chat: OpenAiChat | AnthropicChat;
+  chat: OpenAiChat | AnthropicChat | XAiChat;
 };
 
 export const DEFAULT_SYSTEM =
@@ -223,10 +224,26 @@ export async function runWS(server: Server) {
       log("Error: Profile not found", { profile });
       return null;
     }
-    const ChatEngine = p.vendor === "openai" ? OpenAiChat : AnthropicChat;
 
-    const chatEngine = new ChatEngine(
-      p.vendor === "openai" ? config.openai_key : config.anthropic_key,
+    const engines = {
+      openai: {
+        Engine: OpenAiChat,
+        key: config.openai_key,
+      },
+      anthropic: {
+        Engine: AnthropicChat,
+        key: config.anthropic_key,
+      },
+      xai: {
+        Engine: XAiChat,
+        key: config.xai_key,
+      },
+    };
+
+    const e = engines[p.vendor];
+
+    const chatEngine = new e.Engine(
+      e.key,
       p.model,
       p.system ?? DEFAULT_SYSTEM,
       messages.map((m) => ({

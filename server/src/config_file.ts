@@ -4,10 +4,11 @@ type ConfigFile = {
   database_url: string;
   openai_key: string;
   anthropic_key: string;
+  xai_key: string;
   profiles: Record<
     string,
     {
-      vendor: "openai" | "anthropic";
+      vendor: "openai" | "anthropic" | "xai";
       model: string;
       system?: string;
     }

@@ -246,7 +246,31 @@ textarea:focus {
     font-size: 1em;
     line-height: 1.5;
     color: var(--color-text);
-    margin-bottom: var(--u0);
+    margin-bottom: var(--u2);
+  }
+
+  ul {
+    margin: 0 0 var(--u4) 0;
+    padding: 0 0 0 var(--u4);
+    list-style: none;
+
+    li {
+      margin-bottom: var(--u0);
+      line-height: 150%;
+      &::before {
+        color: var(--color-text-light);
+        content: "–";
+        margin-right: var(--u1);
+        font-weight: bold;
+      }
+      &:last-child {
+        margin-bottom: var(--u0);
+      }
+    }
+  }
+
+  ol {
+    margin: 0;
   }
 
   li {
@@ -270,10 +294,6 @@ textarea:focus {
       padding: 0;
       border-radius: 0;
     }
-  }
-
-  ol {
-    margin: 0;
   }
 }
 

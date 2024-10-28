@@ -11,9 +11,9 @@ Chat with multiple AI models at once.
 ## Features
 
 - Chat with multiple AI models at once
-- OpenAI and Anthropic models supported
-- Create multiple profiles with different system prompts
-- The new `o1-mini`, and `o1-preview` models are supported. But they don't allow streaming.
+- **OpenAI**, **Anthropic**, and **xAI** models supported
+- Multiple profiles with different system prompts
+- The OpenAI's new `o1-mini`, and `o1-preview` models are supported. But they don't allow streaming.
 
 ## Installation
 
@@ -38,6 +38,7 @@ Create a configuration file at `server/config.json` that looks like this:
   "database_url": "postgresql://agora:<YOUR_PASSWORD>@localhost:5432/agora",
   "openai_key": "<YOUR_OPENAI_KEY>",
   "anthropic_key": "<YOUR_ANTHROPIC_KEY>",
+  "xai_key": "<XAI_KEY>",
   "profiles": {
     "o1-preview": {
       "vendor": "openai",
@@ -52,24 +53,9 @@ Create a configuration file at `server/config.json` that looks like this:
       "model": "gpt-4o",
       "system": "You are a helpful assistant. You reply concisely and straightforwardly."
     },
-    "GPT-4": {
-      "vendor": "openai",
-      "model": "gpt-4",
-      "system": "You are a helpful assistant. You reply concisely and straightforwardly."
-    },
-    "GPT-3.5-turbo": {
-      "vendor": "openai",
-      "model": "gpt-3.5-turbo",
-      "system": "You are a helpful assistant. You reply concisely and straightforwardly."
-    },
-    "claude-3-opus": {
+    "claude-3-5-sonnet": {
       "vendor": "anthropic",
-      "model": "claude-3-opus-20240229",
-      "system": "You are a helpful assistant. You reply concisely and straightforwardly."
-    },
-    "claude-3-sonnet": {
-      "vendor": "anthropic",
-      "model": "claude-3-sonnet-20240229",
+      "model": "claude-3-5-sonnet-20240620",
       "system": "You are a helpful assistant. You reply concisely and straightforwardly."
     },
     "claude-3-5-sonnet": {
@@ -77,6 +63,13 @@ Create a configuration file at `server/config.json` that looks like this:
       "model": "claude-3-5-sonnet-20240620",
       "system": "You are a helpful assistant. You reply concisely and straightforwardly."
     },
+    {
+      "grok": {
+        "vendor": "xai",
+        "model": "grok-beta",
+        "system": "You are a helpful assistant. You reply concisely and straightforwardly."
+      }
+    }
     // Add more models here
   }
 }
