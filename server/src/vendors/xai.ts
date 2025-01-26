@@ -1,4 +1,4 @@
-import { ChatEngine } from "./chat_engine";
+import { ChatEngine, ReplyMsgKind } from "./chat_engine";
 import { OpenAiChat } from "./openai";
 
 const BASE_URL = "https://api.x.ai/v1";
@@ -27,11 +27,11 @@ export class XAiChat implements ChatEngine {
 
   // listeners
 
-  onPartialReply(listener: (msg: string) => void) {
+  onPartialReply(listener: (msg: string, kind: ReplyMsgKind) => void) {
     this.engine.onPartialReply(listener);
   }
 
-  onReplyFinish(l: (finishedMessage: string) => void) {
+  onReplyFinish(l: (finishedMessage: string, reasoning: string) => void) {
     this.engine.onReplyFinish(l);
   }
 

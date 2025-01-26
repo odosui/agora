@@ -263,11 +263,11 @@ export async function runWS(server: Server) {
       chat: chatEngine,
     };
 
-    chatEngine.onPartialReply((msg) => {
-      sendMsg(msgs.partialReply(uuid, msg));
+    chatEngine.onPartialReply((msg, kind) => {
+      sendMsg(msgs.partialReply(uuid, msg, kind));
     });
 
-    chatEngine.onReplyFinish(async (msg) => {
+    chatEngine.onReplyFinish(async (msg: string, reasoning: string | null) => {
       const chat = await Chats.oneBy("uuid", uuid);
 
       if (!chat) {
@@ -277,9 +277,9 @@ export async function runWS(server: Server) {
 
       await Messages.create({
         body: msg,
-        // role
-        kind: "assistant",
+        kind: "assistant", // role
         chat_id: chat.id,
+        reasoning: reasoning || null,
       });
 
       sendMsg(msgs.replyFinish(uuid));

@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
-import { WsOutputMessage } from "../../shared/types";
-import { useWs } from "./useWs";
-import api from "./api";
-import { MessageDto } from "../../server/src/db/models/messages";
 import TextareaAutosize from "react-textarea-autosize";
+import { MessageDto } from "../../server/src/db/models/messages";
+import { WsOutputMessage } from "../../shared/types";
+import api from "./api";
 import DeleteButton from "./components/DeleteButton";
+import Reasoning from "./components/Reasoning";
 import DragIcon from "./components/icons/DragIcon";
+import { useWs } from "./useWs";
 
 type Message = {
   role: "user" | "assistant";
   content: string;
+  reasoning?: string | null;
   image?: {
     data: string;
     type: string;
@@ -64,21 +66,45 @@ const Chat: React.FC<{
     (msg: WsOutputMessage) => {
       if (msg.type === "CHAT_PARTIAL_REPLY") {
         if (msg.payload.chatId !== id) return;
+
         setMessages((prev) => {
           const lastMsg = prev[prev.length - 1];
           if (lastMsg?.role === "assistant") {
-            return [
-              ...prev.slice(0, prev.length - 1),
-              {
-                role: "assistant",
-                content: lastMsg.content + msg.payload.content,
-              },
-            ];
+            if (msg.payload.kind === "regular") {
+              return [
+                ...prev.slice(0, prev.length - 1),
+                {
+                  role: "assistant",
+                  content: lastMsg.content + msg.payload.content,
+                  reasoning: lastMsg.reasoning,
+                },
+              ];
+            } else {
+              return [
+                ...prev.slice(0, prev.length - 1),
+                {
+                  role: "assistant",
+                  content: lastMsg.content,
+                  reasoning: (lastMsg.reasoning ?? "") + msg.payload.content,
+                },
+              ];
+            }
           } else {
-            return [
-              ...prev,
-              { role: "assistant", content: msg.payload.content },
-            ];
+            if (msg.payload.kind === "regular") {
+              return [
+                ...prev,
+                { role: "assistant", content: msg.payload.content },
+              ];
+            } else {
+              return [
+                ...prev,
+                {
+                  role: "assistant",
+                  content: "",
+                  reasoning: msg.payload.content,
+                },
+              ];
+            }
           }
         });
       } else if (msg.type === "CHAT_REPLY_FINISH") {
@@ -130,6 +156,7 @@ const Chat: React.FC<{
         msgs.map((m) => ({
           role: m.kind === "user" ? "user" : "assistant",
           content: m.body,
+          reasoning: m.reasoning,
         }))
       );
     }
@@ -157,6 +184,7 @@ const Chat: React.FC<{
                 <div className="from">
                   {m.role} {m.role === "assistant" ? "🤖" : ""}
                 </div>
+                {m.reasoning && <Reasoning reasoning={m.reasoning} />}
                 <div className="content">
                   <Markdown>{m.content}</Markdown>
                 </div>
@@ -227,7 +255,7 @@ const Chat: React.FC<{
   );
 };
 
-async function fileToBase64(file: File) {
+async function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {

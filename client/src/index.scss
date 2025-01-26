@@ -741,3 +741,26 @@ button.icon-button {
     transform: rotate(0.5turn);
   }
 }
+
+.reasoning {
+  margin-top: var(--u1);
+  margin-bottom: var(--u1);
+  font-size: 0.9em;
+  color: var(--color-text-light);
+
+  .reasoning-header {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .reasoning-content {
+    overflow: hidden;
+    transition: max-height 0.2s;
+    border-left: 2px solid var(--color-main-bleak);
+    padding-left: var(--u2);
+  }
+
+  .expanded {
+    max-height: 1000px;
+  }
+}

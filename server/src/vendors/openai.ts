@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { ChatEngine } from "./chat_engine";
+import { ChatEngine, ReplyMsgKind } from "./chat_engine";
 import { OpenAIError } from "openai/error";
 
 type ChatCompletionMessageParam =
@@ -16,9 +16,12 @@ export class OpenAiChat implements ChatEngine {
   private client: OpenAI;
   private messages: ChatCompletionMessageParam[] = [];
 
-  private listeners: ((msg: string) => void)[] = [];
+  private listeners: ((msg: string, kind: ReplyMsgKind) => void)[] = [];
   private errorListeners: ((err: string) => void)[] = [];
-  private finishListeners: ((finishedMessage: string) => void)[] = [];
+  private finishListeners: ((
+    finishedMessage: string,
+    reasoning: string
+  ) => void)[] = [];
 
   constructor(
     apiKey: string,
@@ -54,8 +57,8 @@ export class OpenAiChat implements ChatEngine {
         this.messages.push(assistant(msg));
 
         // notify listeners
-        this.listeners.forEach((l) => l(msg));
-        this.finishListeners.forEach((l) => l(msg));
+        this.listeners.forEach((l) => l(msg, "regular"));
+        this.finishListeners.forEach((l) => l(msg, ""));
       } catch (e) {
         if (e instanceof OpenAIError) {
           const errMessage = e.message;
@@ -73,15 +76,25 @@ export class OpenAiChat implements ChatEngine {
         });
 
         let msg = "";
+        let reasoning = "";
 
         for await (const part of stream) {
-          console.log(part.choices);
-          // collect regular message
-          const p = part.choices[0]?.delta?.content || "";
-          if (p) {
-            // notify listeners
-            this.listeners.forEach((listener) => listener(p));
-            msg += p;
+          const delta = part.choices[0]?.delta;
+          const content = delta?.content || "";
+          // @ts-ignore
+          const reasoning_content: string = delta?.reasoning_content || "";
+
+          // notify listeners
+          if (content) {
+            this.listeners.forEach((listener) => listener(content, "regular"));
+            msg += content;
+          } else if (reasoning_content) {
+            this.listeners.forEach((listener) =>
+              listener(reasoning_content, "reasoning")
+            );
+            reasoning += reasoning_content;
+          } else {
+            console.error("Unknown message type", part.choices);
           }
         }
 
@@ -89,7 +102,7 @@ export class OpenAiChat implements ChatEngine {
         this.messages.push(assistant(msg));
 
         // notify listeners
-        this.finishListeners.forEach((l) => l(msg));
+        this.finishListeners.forEach((l) => l(msg, reasoning));
       } catch (e) {
         if (e instanceof OpenAIError) {
           const errMessage = e.message;
@@ -109,11 +122,11 @@ export class OpenAiChat implements ChatEngine {
 
   // listeners
 
-  onPartialReply(listener: (msg: string) => void) {
+  onPartialReply(listener: (msg: string, kind: ReplyMsgKind) => void) {
     this.listeners.push(listener);
   }
 
-  onReplyFinish(l: (finishedMessage: string) => void) {
+  onReplyFinish(l: (finishedMessage: string, reasoning: string) => void) {
     this.finishListeners.push(l);
   }
 

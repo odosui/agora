@@ -5,13 +5,19 @@
 import { WsOutputMessage } from "../../shared/types";
 import { ChatDto } from "./db/models/chats";
 import { WidgetDto } from "./db/models/widgets";
+import { ReplyMsgKind } from "./vendors/chat_engine";
 
-function partialReply(id: string, content: string): WsOutputMessage {
+function partialReply(
+  id: string,
+  content: string,
+  kind: ReplyMsgKind
+): WsOutputMessage {
   return {
     type: "CHAT_PARTIAL_REPLY",
     payload: {
       chatId: id,
       content,
+      kind,
     },
   };
 }

@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { MessageParam } from "@anthropic-ai/sdk/resources";
-import { ChatEngine } from "./chat_engine";
+import { ChatEngine, ReplyMsgKind } from "./chat_engine";
 
 const MAX_TOKENS = 1024;
 
@@ -10,8 +10,11 @@ export class AnthropicChat implements ChatEngine {
   private messages: MessageParam[] = [];
   private system: string;
 
-  private listeners: ((msg: string) => void)[] = [];
-  private finishListeners: ((finishedMessage: string) => void)[] = [];
+  private listeners: ((msg: string, kind: ReplyMsgKind) => void)[] = [];
+  private finishListeners: ((
+    finishedMessage: string,
+    reasoning: string
+  ) => void)[] = [];
   private errorListeners: ((err: string) => void)[] = [];
 
   constructor(
@@ -43,13 +46,13 @@ export class AnthropicChat implements ChatEngine {
       .on("text", (p) => {
         // collect regular message
         if (p) {
-          this.listeners.forEach((listener) => listener(p));
+          this.listeners.forEach((listener) => listener(p, "regular"));
           msg += p;
         }
       })
       .on("end", () => {
         // notify listeners
-        this.finishListeners.forEach((l) => l(msg));
+        this.finishListeners.forEach((l) => l(msg, ""));
         this.messages.push(assistant(msg));
       })
       .on("error", (err) => {
@@ -85,11 +88,11 @@ export class AnthropicChat implements ChatEngine {
 
   // listeners
 
-  onPartialReply(listener: (msg: string) => void) {
+  onPartialReply(listener: (msg: string, kind: ReplyMsgKind) => void) {
     this.listeners.push(listener);
   }
 
-  onReplyFinish(l: (finishedMessage: string) => void) {
+  onReplyFinish(l: (finishedMessage: string, reasoning: string) => void) {
     this.finishListeners.push(l);
   }
 

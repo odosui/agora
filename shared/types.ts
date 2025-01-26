@@ -1,5 +1,6 @@
 import { ChatDto } from "../server/src/db/models/chats";
 import { WidgetDto } from "../server/src/db/models/widgets";
+import { ReplyMsgKind } from "../server/src/vendors/chat_engine";
 
 export type WsInputMessage =
   | {
@@ -43,6 +44,7 @@ export type WsOutputMessage =
       payload: {
         chatId: string;
         content: string;
+        kind: ReplyMsgKind;
       };
     }
   | {
