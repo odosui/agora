@@ -507,7 +507,7 @@ li p {
 
   .top-menu {
     height: var(--u5);
-    padding: 0 var(--u3);
+    padding: 0 0 0 var(--u3);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -531,25 +531,34 @@ li p {
 
     .right {
       display: flex;
-      gap: var(--u0);
       align-items: center;
       justify-content: end;
 
       .drag-handle {
         cursor: grab;
         color: white;
+        svg {
+          fill: white;
+        }
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--u0);
+        &:hover {
+          background-color: var(--color-main-intense);
+        }
       }
 
       button {
-        color: var(--color-text-light);
-        background-color: white;
+        // color: var(--color-text-light);
+        // background-color: white;
         width: var(--u4);
         height: var(--u4);
         padding: var(--u0);
 
-        &:hover {
-          background-color: var(--color-bg-alt);
-        }
+        // &:hover {
+        //   background-color: var(--color-bg-alt);
+        // }
       }
     }
   }

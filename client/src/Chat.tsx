@@ -6,6 +6,7 @@ import api from "./api";
 import { MessageDto } from "../../server/src/db/models/messages";
 import TextareaAutosize from "react-textarea-autosize";
 import DeleteButton from "./components/DeleteButton";
+import DragIcon from "./components/icons/DragIcon";
 
 type Message = {
   role: "user" | "assistant";
@@ -143,7 +144,9 @@ const Chat: React.FC<{
         </div>
         <div className="right">
           <DeleteButton onDelete={onDelete} />
-          <div className="drag-handle">::</div>
+          <div className="drag-handle">
+            <DragIcon />
+          </div>
         </div>
       </div>
       <div className="body">

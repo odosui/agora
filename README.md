@@ -10,10 +10,10 @@ Chat with multiple AI models at once.
 
 ## Features
 
-- Chat with multiple AI models at once
-- **OpenAI**, **Anthropic**, and **xAI** models supported
+- Multiple AI models in the same dashboard
+- **OpenAI**, **Anthropic**, **Deepseek**, and **xAI** models are supported
+- Reasoning models as OpenAI's `o1` and Deepseek's `r1` are supported as well
 - Multiple profiles with different system prompts
-- The OpenAI's new `o1-mini`, and `o1-preview` models are supported. But they don't allow streaming.
 
 ## Installation
 
@@ -23,13 +23,17 @@ Both `server` and `client` dependencies need to be installed.
 cd server
 npm install
 
-cd ../client
+cd client
 npm install
 ```
 
 ## Usage
 
+### PostgreSQL
+
 Multichat AI requires a PostgreSQL database to store chat logs. You can install it locally or use a cloud service. The database url must be provided in the configuration file.
+
+### Configuration file
 
 Create a configuration file at `server/config.json` that looks like this:
 
