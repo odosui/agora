@@ -2,7 +2,7 @@ const api = {
   get,
   post,
   // put,
-  // del,
+  del,
   patch,
   // multipart,
 };
@@ -59,9 +59,9 @@ function patch<T>(url: string, payload?: object) {
   return apic<T>("PATCH", url, payload);
 }
 
-// function del<T>(url: string) {
-//   return apic<T>("DELETE", url);
-// }
+function del<T>(url: string) {
+  return apic<T>("DELETE", url);
+}
 
 async function apic<T>(method: string, url: string, data?: object) {
   const headers = new Headers();

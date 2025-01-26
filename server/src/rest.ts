@@ -96,6 +96,32 @@ export async function runRest() {
     res.json(dbToDto(db));
   });
 
+  app.delete("/api/dashboards/:uuid", async (req, res) => {
+    const uuid = req.params.uuid;
+
+    let db: Dashboard | null = null;
+
+    try {
+      db = await Dashboards.oneBy("uuid", uuid);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
+
+    if (!db) {
+      res.status(404).json({ error: "Dashboard not found" });
+      return;
+    }
+
+    // detele chats first
+    await Chats.deleteBy("dashboard_id", db.id);
+    await Widgets.deleteBy("dashboard_id", db.id);
+    await Dashboards.deleteBy("uuid", uuid);
+
+    res.json({ success: true });
+  });
+
   app.get("/api/dashboards/:id/chats", async (req, res) => {
     const id = req.params.id;
 

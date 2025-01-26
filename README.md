@@ -1,10 +1,10 @@
-# Agora
+# Multichat AI
 
 Chat with multiple AI models at once.
 
 <p>
   <div>
-    <img src="./img/agora.png" width="100%" alt="Agora Screenshot" />
+    <img src="./img/agora.png" width="100%" alt="Multichat AI Screenshot" />
   </div>
 </p>
 
@@ -29,7 +29,7 @@ npm install
 
 ## Usage
 
-Agora requires a PostgreSQL database to store chat logs. You can install it locally or use a cloud service. The database url must be provided in the configuration file.
+Multichat AI requires a PostgreSQL database to store chat logs. You can install it locally or use a cloud service. The database url must be provided in the configuration file.
 
 Create a configuration file at `server/config.json` that looks like this:
 

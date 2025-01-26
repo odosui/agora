@@ -5,10 +5,11 @@ type ConfigFile = {
   openai_key: string;
   anthropic_key: string;
   xai_key: string;
+  deepseek_key: string;
   profiles: Record<
     string,
     {
-      vendor: "openai" | "anthropic" | "xai";
+      vendor: "openai" | "anthropic" | "xai" | "deepseek";
       model: string;
       system?: string;
     }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Dashboard } from "../../../server/src/db/models/dashboards";
 import api from "../api";
+import DeleteButton from "../components/DeleteButton";
 import NavBar from "../features/layout/NavBar";
 
 function HomePage() {
@@ -27,6 +28,14 @@ function HomePage() {
     setName("");
   };
 
+  const handleDelete = async (uuid: string) => {
+    if (!window.confirm("Are you sure?")) {
+      return;
+    }
+    await api.del(`/dashboards/${uuid}`);
+    setDashboards((prev) => prev.filter((db) => db.uuid !== uuid));
+  };
+
   return (
     <div className="layout-wrapper">
       <aside>
@@ -43,6 +52,7 @@ function HomePage() {
               <div className="bottom">
                 <Link to={`/db/${db.uuid}`}>Open the dashboard →</Link>
               </div>
+              <DeleteButton onDelete={() => handleDelete(db.uuid)} />
             </div>
           ))}
         </div>

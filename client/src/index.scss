@@ -412,6 +412,7 @@ li p {
 
   h1 {
     font-weight: 400;
+    margin-bottom: var(--u4);
   }
 
   .dashboard-list {
@@ -428,25 +429,22 @@ li p {
     overflow: hidden;
     padding: var(--u3);
     border-radius: var(--u1);
-    width: var(--u10);
+    width: var(--u11);
     height: var(--u8);
     margin-bottom: var(--u5);
     border: 1px solid var(--color-border);
-    // transition: background-color 0.25s;
-    // &:hover {
-    //   background-color: var(--color-bg-alt);
-    // }
 
     h3 {
       margin: 0;
       font-weight: 400;
-      font-size: 1.6em;
+      font-size: 1.4em;
       color: var(--color-text-light);
       margin-bottom: var(--u1);
     }
   }
 
   .db-form {
+    border: 1px solid var(--color-border);
     display: flex;
     flex-direction: row;
     gap: var(--u2);
@@ -515,6 +513,7 @@ li p {
     justify-content: space-between;
     border-bottom: 1px solid var(--color-border-light);
     overflow: hidden;
+    background-color: var(--color-main);
 
     .left {
       display: flex;
@@ -522,10 +521,9 @@ li p {
 
       .profile-name {
         color: white;
-        font-weight: 500;
+        font-weight: 600;
         font-size: 0.8em;
-        color: var(--color-text);
-        // background-color: var(--color-main);
+        color: white;
         // padding: var(--u0) var(--u2);
         // border-radius: var(--u1);
       }
@@ -539,7 +537,7 @@ li p {
 
       .drag-handle {
         cursor: grab;
-        color: var(--color-text-light);
+        color: white;
       }
 
       button {

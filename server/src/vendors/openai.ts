@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { ChatEngine } from "./chat_engine";
+import { OpenAIError } from "openai/error";
 
 type ChatCompletionMessageParam =
   OpenAI.Chat.Completions.ChatCompletionMessageParam;
@@ -16,6 +17,7 @@ export class OpenAiChat implements ChatEngine {
   private messages: ChatCompletionMessageParam[] = [];
 
   private listeners: ((msg: string) => void)[] = [];
+  private errorListeners: ((err: string) => void)[] = [];
   private finishListeners: ((finishedMessage: string) => void)[] = [];
 
   constructor(
@@ -40,41 +42,62 @@ export class OpenAiChat implements ChatEngine {
 
     // models like o1-preview and o1-mini do not support streaming
     if (isStreamingNotSupported(this.model)) {
-      const result = await this.client.chat.completions.create({
-        model: this.model,
-        messages: this.messages,
-      });
+      try {
+        console.log("AAAAAAAAAAA");
+        const result = await this.client.chat.completions.create({
+          model: this.model,
+          messages: this.messages,
+        });
 
-      const msg = result.choices[0]?.message?.content || "";
-      this.messages.push(assistant(msg));
+        console.log(result);
 
-      // notify listeners
-      this.listeners.forEach((l) => l(msg));
-      this.finishListeners.forEach((l) => l(msg));
-    } else {
-      const stream = await this.client.chat.completions.create({
-        model: this.model,
-        messages: this.messages,
-        stream: true,
-      });
+        const msg = result.choices[0]?.message?.content || "";
+        this.messages.push(assistant(msg));
 
-      let msg = "";
-
-      for await (const part of stream) {
-        // collect regular message
-        const p = part.choices[0]?.delta?.content || "";
-        if (p) {
-          // notify listeners
-          this.listeners.forEach((listener) => listener(p));
-          msg += p;
+        // notify listeners
+        this.listeners.forEach((l) => l(msg));
+        this.finishListeners.forEach((l) => l(msg));
+      } catch (e) {
+        if (e instanceof OpenAIError) {
+          const errMessage = e.message;
+          this.errorListeners.forEach((l) => l(errMessage));
+        } else {
+          throw e;
         }
       }
+    } else {
+      try {
+        const stream = await this.client.chat.completions.create({
+          model: this.model,
+          messages: this.messages,
+          stream: true,
+        });
 
-      stream.controller.abort();
-      this.messages.push(assistant(msg));
+        let msg = "";
 
-      // notify listeners
-      this.finishListeners.forEach((l) => l(msg));
+        for await (const part of stream) {
+          // collect regular message
+          const p = part.choices[0]?.delta?.content || "";
+          if (p) {
+            // notify listeners
+            this.listeners.forEach((listener) => listener(p));
+            msg += p;
+          }
+        }
+
+        stream.controller.abort();
+        this.messages.push(assistant(msg));
+
+        // notify listeners
+        this.finishListeners.forEach((l) => l(msg));
+      } catch (e) {
+        if (e instanceof OpenAIError) {
+          const errMessage = e.message;
+          this.errorListeners.forEach((l) => l(errMessage));
+        } else {
+          throw e;
+        }
+      }
     }
   }
 
@@ -95,7 +118,7 @@ export class OpenAiChat implements ChatEngine {
   }
 
   onError(l: (err: string) => void) {
-    // TODO: implement error handling
+    this.errorListeners.push(l);
   }
 
   // for plugins

@@ -13,11 +13,12 @@ import { log } from "./utils";
 import { AnthropicChat } from "./vendors/anthropic";
 import { OpenAiChat } from "./vendors/openai";
 import { XAiChat } from "./vendors/xai";
+import { DeepseekChat } from "./vendors/deepseek";
 
 type ChatRecord = {
   profile: string;
   messages: [];
-  chat: OpenAiChat | AnthropicChat | XAiChat;
+  chat: OpenAiChat | AnthropicChat | XAiChat | DeepseekChat;
 };
 
 export const DEFAULT_SYSTEM =
@@ -237,6 +238,10 @@ export async function runWS(server: Server) {
       xai: {
         Engine: XAiChat,
         key: config.xai_key,
+      },
+      deepseek: {
+        Engine: DeepseekChat,
+        key: config.deepseek_key,
       },
     };
 
