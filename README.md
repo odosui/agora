@@ -50,6 +50,7 @@ Create a configuration file at `server/config.json` that looks like this:
   "openai_key": "<YOUR_OPENAI_KEY>",
   "anthropic_key": "<YOUR_ANTHROPIC_KEY>",
   "xai_key": "<XAI_KEY>",
+  "deepseek_key": "<DEEPSEEK_KEY>",
   "profiles": {
     "o1-preview": {
       "vendor": "openai",
@@ -74,12 +75,14 @@ Create a configuration file at `server/config.json` that looks like this:
       "model": "claude-3-5-sonnet-20240620",
       "system": "You are a helpful assistant. You reply concisely and straightforwardly."
     },
-    {
-      "grok": {
-        "vendor": "xai",
-        "model": "grok-beta",
-        "system": "You are a helpful assistant. You reply concisely and straightforwardly."
-      }
+    "grok": {
+      "vendor": "xai",
+      "model": "grok-beta",
+      "system": "You are a helpful assistant. You reply concisely and straightforwardly."
+    },
+    "deepseek:r1": {
+      "vendor": "deepseek",
+      "model": "deepseek-reasoner"
     }
     // Add more models here
   }
