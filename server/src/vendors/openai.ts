@@ -43,7 +43,6 @@ export class OpenAiChat implements ChatEngine {
     // models like o1-preview and o1-mini do not support streaming
     if (isStreamingNotSupported(this.model)) {
       try {
-        console.log("AAAAAAAAAAA");
         const result = await this.client.chat.completions.create({
           model: this.model,
           messages: this.messages,
@@ -76,6 +75,7 @@ export class OpenAiChat implements ChatEngine {
         let msg = "";
 
         for await (const part of stream) {
+          console.log(part.choices);
           // collect regular message
           const p = part.choices[0]?.delta?.content || "";
           if (p) {
